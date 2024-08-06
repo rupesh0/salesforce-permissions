@@ -4,7 +4,7 @@ public with sharing class MyPermissionsController {
     try {
       PermissionDetail pd = new PermissionDetail();
       pd.currentUsersProfileId = UserInfo.getProfileId();
-      pd.currentUsersPermissionSets = new List<Id>{};
+      pd.currentUsersPermissionSetIds = new List<Id>{};
 
       for (PermissionSet ps : [
         SELECT Id
@@ -17,7 +17,7 @@ public with sharing class MyPermissionsController {
             WHERE AssigneeId = :UserInfo.getUserId()
           )
       ]) {
-        pd.currentUsersPermissionSets.add(ps.Id);
+        pd.currentUsersPermissionSetIds.add(ps.Id);
       }
 
       return pd;
@@ -30,6 +30,6 @@ public with sharing class MyPermissionsController {
     @AuraEnabled
     public Id currentUsersProfileId;
     @AuraEnabled
-    public List<Id> currentUsersPermissionSets;
+    public List<Id> currentUsersPermissionSetIds;
   }
 }
