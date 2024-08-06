@@ -10,7 +10,7 @@ export default class MyPermissions extends LightningElement {
       const result = await getCurrentUsersDetails();
       this.filters = {
         profileIds: [result.currentUsersProfileId],
-        PermissionSetIds: result.currentUsersPermissionSetIds
+        permissionSetIds: result.currentUsersPermissionSetIds
       };
     } catch (ex) {
       const event = new ShowToastEvent({
