@@ -1,1 +1,31 @@
-<template> </template>
+<template>
+  <div style="position: relative">
+    <lightning-spinner
+      lwc:if={isLoading}
+      alternative-text={labels.loading}
+      size="medium"
+      variant="base"
+    ></lightning-spinner>
+
+    <div lwc:if={error}>
+      <c-illustration title={labels.error} sub-title={error}></c-illustration>
+    </div>
+    <div lwc:else class="slds-grid slds-grid_vertical">
+      <c-toolbar
+        class="slds-col"
+        object-count={objectCount}
+        field-count={fieldCount}
+        is-filter-button-selected={isFilterButtonSelected}
+        onsearch={handleSearch}
+        onfilterbuttonclick={handleFilterButtonClick}
+      ></c-toolbar>
+      <div class="slds-col">
+        <c-permission-table
+          lwc:if={showTable}
+          field-permissions={state.fieldPermissions}
+          object-permissions={state.objPermissions}
+        ></c-permission-table>
+      </div>
+    </div>
+  </div>
+</template>
