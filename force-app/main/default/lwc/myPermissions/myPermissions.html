@@ -1,3 +1,18 @@
 <template>
-  <c-permissions lwc:if={filters} filters={filters}></c-permissions>
+  <div style="position: relative">
+    <lightning-spinner
+      lwc:if={isLoading}
+      alternative-text={labels.loading}
+      size="medium"
+      variant="base"
+    ></lightning-spinner>
+    <article class="slds-card">
+      <c-permissions lwc:if={filters} filters={filters}></c-permissions>
+      <c-illustration
+        lwc:if={error}
+        title={labels.error}
+        sub-title={error}
+      ></c-illustration>
+    </article>
+  </div>
 </template>
