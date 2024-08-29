@@ -1,0 +1,113 @@
+<template>
+  <!-- sldsValidatorIgnore -->
+  <div class="slds-grid slds-border_top" style="height: 100%">
+    <div
+      class="slds-col slds-border_right slds-scrollable_y"
+      style="height: 300px"
+    >
+      <table border="1">
+        <tr>
+          <th></th>
+          <th style="width: 100px">{labels.label}</th>
+          <th style="width: 100px">{labels.apiName}</th>
+          <th>{labels.read}</th>
+          <th>{labels.create}</th>
+          <th>{labels.edit}</th>
+          <th>{labels.delete}</th>
+          <th>{labels.viewAll}</th>
+          <th>{labels.modifyAll}</th>
+        </tr>
+        <template for:each={objectPermissions} for:item="objectPermission">
+          <tr key={objectPermission.apiName}>
+            <td>
+              <input
+                type="radio"
+                name="select"
+                data-id={objectPermission.apiName}
+                onclick={handleObjectChange}
+              />
+            </td>
+            <td>{objectPermission.label}</td>
+            <td>{objectPermission.apiName}</td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.isReadable}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.isCreateable}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.isEditable}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.isDeletable}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.viewAll}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={objectPermission.modifyAll}
+              />
+            </td>
+          </tr>
+        </template>
+      </table>
+    </div>
+    <div class="spiltter"></div>
+    <div class="slds-col slds-scrollable_y" style="height: 300px">
+      <table border="1">
+        <tr>
+          <th>{labels.label}</th>
+          <th>{labels.apiName}</th>
+          <th>{labels.read}</th>
+          <th>{labels.edit}</th>
+        </tr>
+        <template
+          for:each={fieldPermissionsToDisplay}
+          for:item="fieldPermission"
+        >
+          <tr key={fieldPermission.apiName}>
+            <td>{fieldPermission.label}</td>
+            <td>{fieldPermission.apiName}</td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={fieldPermission.isReadable}
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                readonly
+                checked={fieldPermission.isEditable}
+              />
+            </td>
+          </tr>
+        </template>
+      </table>
+    </div>
+  </div>
+</template>
