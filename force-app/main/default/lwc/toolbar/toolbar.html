@@ -47,7 +47,10 @@
                 onclick={handleFilterButtonClick}
                 alternative-text={labels.filter}
               ></lightning-button-icon-stateful>
-              <div class="slds-is-absolute popover-placement">
+              <div
+                lwc:if={isFilterPanelOpen}
+                class="slds-is-absolute popover-placement"
+              >
                 <section
                   class="slds-popover slds-nubbin_top-right"
                   role="dialog"

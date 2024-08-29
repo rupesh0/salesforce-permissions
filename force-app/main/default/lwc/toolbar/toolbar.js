@@ -7,6 +7,8 @@ export default class Toolbar extends LightningElement {
   @api fieldCount = 0;
   @api isFilterButtonSelected = false;
 
+  isFilterPanelOpen = false;
+
   handleInputChange() {
     const input = this.template.querySelector("lightning-input");
     if (input.reportValidity()) {
@@ -16,6 +18,7 @@ export default class Toolbar extends LightningElement {
 
   handleFilterButtonClick() {
     this.dispatchEvent(new FilterButtonClickEvent());
+    this.isFilterPanelOpen = !this.isFilterPanelOpen;
   }
 
   get labels() {
