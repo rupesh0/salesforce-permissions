@@ -1,0 +1,76 @@
+<template>
+  <div class="slds-page-header">
+    <div class="slds-page-header__row">
+      <div class="slds-page-header__col-title">
+        <div class="slds-page-header__name">
+          <div class="slds-page-header__name-title">
+            <h1>
+              <span class="slds-page-header__title slds-truncate" title={title}
+                >{labels.title}</span
+              >
+            </h1>
+          </div>
+        </div>
+      </div>
+      <div class="slds-page-header__col-actions">
+        <div class="slds-page-header__controls"></div>
+      </div>
+    </div>
+    <div class="slds-page-header__row">
+      <div class="slds-page-header__col-meta">
+        <div class="slds-page-header__meta-text">
+          <span class="slds-list_horizontal slds-wrap slds-has-dividers_right">
+            <template for:each={subTitles} for:item="subTitle">
+              <span key={subTitle} class="slds-item divider-adjust"
+                >{subTitle}</span
+              >
+            </template>
+          </span>
+        </div>
+      </div>
+      <div class="slds-page-header__col-controls">
+        <div class="slds-page-header__controls">
+          <div class="slds-page-header__control">
+            <lightning-input
+              variant="label-hidden"
+              type="search"
+              placeholder={labels.inputPlaceHolder}
+              min-length={minInputLength}
+              oncommit={handleInputChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-page-header__control">
+            <div class="slds-is-relative">
+              <lightning-button-icon-stateful
+                icon-name="utility:filterList"
+                selected={isFilterButtonSelected}
+                onclick={handleFilterButtonClick}
+                alternative-text={labels.filter}
+              ></lightning-button-icon-stateful>
+              <div class="slds-is-absolute popover-placement">
+                <section
+                  class="slds-popover slds-nubbin_top-right"
+                  role="dialog"
+                >
+                  <div class="slds-popover__body">
+                    <c-combobox></c-combobox>
+                  </div>
+                  <footer class="slds-popover__footer">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                      <lightning-button
+                        class="slds-col_bump-left"
+                        variant="brand"
+                        label="Button Label"
+                        onclick={handleClick}
+                      ></lightning-button>
+                    </div>
+                  </footer>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
