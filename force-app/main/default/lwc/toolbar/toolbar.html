@@ -51,24 +51,7 @@
                 lwc:if={isFilterPanelOpen}
                 class="slds-is-absolute popover-placement"
               >
-                <section
-                  class="slds-popover slds-nubbin_top-right"
-                  role="dialog"
-                >
-                  <div class="slds-popover__body">
-                    <c-combobox></c-combobox>
-                  </div>
-                  <footer class="slds-popover__footer">
-                    <div class="slds-grid slds-grid_vertical-align-center">
-                      <lightning-button
-                        class="slds-col_bump-left"
-                        variant="brand"
-                        label="Button Label"
-                        onclick={handleClick}
-                      ></lightning-button>
-                    </div>
-                  </footer>
-                </section>
+                <c-filter-panel></c-filter-panel>
               </div>
             </div>
           </div>
