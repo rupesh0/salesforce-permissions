@@ -15,12 +15,22 @@
       </div>
     </div>
     <footer class="slds-popover__footer">
-      <div class="slds-grid slds-grid_vertical-align-center">
+      <div class="slds-grid slds-grid_align-spread">
         <lightning-button
-          class="slds-col_bump-left"
+          class="slds-col"
+          label="Clear"
+          onclick={handleClearClick}
+        ></lightning-button>
+        <lightning-button
+          class="slds-col"
+          label="Reset"
+          onclick={handleResetClick}
+        ></lightning-button>
+        <lightning-button
+          class="slds-col"
           variant="brand"
-          label="Button Label"
-          onclick={handleClick}
+          label="Apply"
+          onclick={handleApplyClick}
         ></lightning-button>
       </div>
     </footer>

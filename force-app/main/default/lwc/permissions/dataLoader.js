@@ -3,44 +3,26 @@ import getObjectPermissions from "@salesforce/apex/PermissionsController.getObje
 import getObjectInfos from "@salesforce/apex/PermissionsController.getObjectInfos";
 import getFieldInfos from "@salesforce/apex/PermissionsController.getFieldInfos";
 
-export async function loadPermissions(state) {
+export async function loadPermissions(filters, objInfo) {
   const loadObjP = Promise.withResolvers();
   const loadFieldP = Promise.withResolvers();
 
-  loadFieldPermissions(state, loadFieldP);
-  loadObjectPermissions(state, loadObjP);
+  loadFieldPermissions(filters, objInfo, loadFieldP);
+  loadObjectPermissions(filters, objInfo, loadObjP);
 
-  await Promise.all([loadObjP.promise, loadFieldP.promise]);
+  const result = await Promise.all([loadObjP.promise, loadFieldP.promise]);
+  return result;
 }
 
-export async function loadFields(state) {
+function loadFieldPermissions(filters, objInfo, loadFieldP) {
   let promises = [];
-  for (let i = 0; i < state.objInfo.length; i += 400) {
-    promises.push(
-      getFieldInfos({
-        objectApiNames: state.objInfo
-          .slice(i, i + 400)
-          .map((info) => info.apiName)
-      })
-    );
-  }
-
-  await Promise.all(promises).then((results) => {
-    state.fieldInfo = [...results.flat(2)];
-  });
-}
-
-function loadFieldPermissions(state, loadFieldP) {
-  let promises = [];
-  for (let i = 0; i < state.objInfo.length; i += 400) {
+  for (let i = 0; i < objInfo.length; i += 400) {
     promises.push(
       getFieldPermissions({
         request: {
-          profileIds: state.filters.profileIds,
-          permissionSetIds: state.filters.permissionSetIds,
-          objectApiNames: state.objInfo
-            .slice(i, i + 400)
-            .map((info) => info.apiName)
+          profileIds: filters.profileIds,
+          permissionSetIds: filters.permissionSetIds,
+          objectApiNames: objInfo.slice(i, i + 400).map((info) => info.apiName)
         }
       })
     );
@@ -52,25 +34,22 @@ function loadFieldPermissions(state, loadFieldP) {
       results.forEach((d) => {
         a = { ...a, ...d };
       });
-      state.fieldPermissions = a;
-      loadFieldP.resolve();
+      loadFieldP.resolve(a);
     })
     .catch((error) => {
       loadFieldP.reject(error);
     });
 }
 
-function loadObjectPermissions(state, loadObjP) {
+function loadObjectPermissions(filters, objInfo, loadObjP) {
   let promises = [];
-  for (let i = 0; i < state.objInfo.length; i += 500) {
+  for (let i = 0; i < objInfo.length; i += 500) {
     promises.push(
       getObjectPermissions({
         request: {
-          profileIds: state.filters.profileIds,
-          permissionSetIds: state.filters.permissionSetIds,
-          objectApiNames: state.objInfo
-            .slice(i, i + 500)
-            .map((info) => info.apiName)
+          profileIds: filters.profileIds,
+          permissionSetIds: filters.permissionSetIds,
+          objectApiNames: objInfo.slice(i, i + 500).map((info) => info.apiName)
         }
       })
     );
@@ -82,9 +61,7 @@ function loadObjectPermissions(state, loadObjP) {
       results.forEach((d) => {
         a = { ...a, ...d };
       });
-
-      state.objPermissions = a;
-      loadObjP.resolve();
+      loadObjP.resolve(a);
     })
     .catch((error) => {
       loadObjP.reject(error);
@@ -94,4 +71,21 @@ function loadObjectPermissions(state, loadObjP) {
 export async function loadObjectInfo() {
   const info = await getObjectInfos();
   return info;
+}
+
+export async function loadFields(objInfo) {
+  let promises = [];
+  for (let i = 0; i < objInfo.length; i += 400) {
+    promises.push(
+      getFieldInfos({
+        objectApiNames: objInfo.slice(i, i + 400).map((info) => info.apiName)
+      })
+    );
+  }
+
+  let result = [];
+  await Promise.all(promises).then((results) => {
+    result = [...results.flat(2)];
+  });
+  return result;
 }
