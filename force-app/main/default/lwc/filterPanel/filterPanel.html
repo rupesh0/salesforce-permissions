@@ -5,10 +5,12 @@
         <c-permission-set-combobox
           class="slds-col"
           selected-values={filterValues.permissionSetIds}
+          onchange={handlePermissionSetChange}
         ></c-permission-set-combobox>
         <c-profile-combobox
           class="slds-col"
           selected-values={filterValues.profileIds}
+          onchange={handleProfileChange}
         ></c-profile-combobox>
       </div>
     </div>

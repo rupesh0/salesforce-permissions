@@ -60,6 +60,7 @@ export default class Combobox extends LightningElement {
     const index = event.detail.index;
     this.selectedValues.splice(index, 1);
     this._selectedValues = [...this._selectedValues];
+    this.dispatchEvent(new ChangeEvent(this.selectedValues));
   }
 
   get selectedOptions() {

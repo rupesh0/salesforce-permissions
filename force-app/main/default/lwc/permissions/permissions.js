@@ -96,6 +96,11 @@ export default class Permissions extends LightningElement {
     }
   }
 
+  hanldeFilterValueChange(event) {
+    event.stopPropagation();
+    this.filterController.updateFilters(event.detail);
+  }
+
   handleFilterButtonClick() {
     this.isFilterButtonSelected = !this.isFilterButtonSelected;
   }

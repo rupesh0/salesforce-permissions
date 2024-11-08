@@ -3,7 +3,23 @@ import { LightningElement, api } from "lwc";
 export default class FilterPanel extends LightningElement {
   @api filterValues;
 
-  options = [{ value: "value", label: "label" }];
+  handlePermissionSetChange(event) {
+    event.stopPropagation();
+    this.dispatchFilterChangeEvent({
+      permissionSetIds: event.detail.selectedValues
+    });
+  }
+
+  handleProfileChange(event) {
+    event.stopPropagation();
+    this.dispatchFilterChangeEvent({ profileIds: event.detail.selectedValues });
+  }
+
+  dispatchFilterChangeEvent(detail) {
+    this.dispatchEvent(
+      new CustomEvent("filterchange", { detail, bubbles: true, composed: true })
+    );
+  }
 
   handleResetClick() {
     this.dispatchEvent(

@@ -1,12 +1,14 @@
-
-
 class ChangeEvent extends CustomEvent {
-    constructor(selectedValues) {
-        super(ChangeEvent.type, {detail: {selectedValues}})
-    }
-    static type() {
-        return 'change';
-    }
+  constructor(selectedValues) {
+    super(ChangeEvent.type, {
+      detail: { selectedValues },
+      bubbles: true,
+      composed: true
+    });
+  }
+  static get type() {
+    return "change";
+  }
 }
 
-export {ChangeEvent}
+export { ChangeEvent };

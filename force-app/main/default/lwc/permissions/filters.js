@@ -24,6 +24,10 @@ class Filters {
     this._currentFilters = Object.assign({}, filterObj);
   }
 
+  updateFilters(detail) {
+    this._currentFilters = Object.assign(this._currentFilters, detail);
+  }
+
   resetFilters() {
     this._currentFilters = Object.assign({}, this._defaultFilters);
   }
