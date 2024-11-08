@@ -5,29 +5,40 @@ import { ChangeEvent } from "./events";
 export default class Combobox extends LightningElement {
   @api label;
   @api placeholder = "Search...";
-  @api options;
-  @api selectedValues = [];
+
+  @api get options() {
+    return this._allOptions;
+  }
+  set options(value) {
+    this.filteredOptions = value?.slice(0) ?? [];
+    this._allOptions = value?.slice(0) ?? [];
+  }
+
+  @api get selectedValues() {
+    return this._selectedValues;
+  }
+  set selectedValues(value) {
+    this._selectedValues = value?.slice(0) ?? [];
+  }
 
   filteredOptions = [];
+  _allOptions = [];
+  _selectedValues = [];
   toggleOptions = false;
-
-  connectedCallback() {
-    this.filteredOptions = this.options?.slice(0) ?? [];
-  }
 
   handleFocus() {
     this.toggleOptions = true;
   }
 
   handleBlur() {
-	debounce(() => {
-		this.toggleOptions = false;
-	  })();
+    debounce(() => {
+      this.toggleOptions = false;
+    })();
   }
 
   handleSelect(event) {
     const selectedValue = event.currentTarget.dataset.rowid;
-    this.selectedValues.push(selectedValue);	
+    this.selectedValues.push(selectedValue);
     this.toggleOptions = false;
 
     this.dispatchEvent(new ChangeEvent(this.selectedValues));
@@ -46,15 +57,15 @@ export default class Combobox extends LightningElement {
   }
 
   handleItemRemove(event) {
-	const index = event.detail.index;
-	this.selectedValues.splice(index, 1);
-	this.selectedValues = [...this.selectedValues]
-}
+    const index = event.detail.index;
+    this.selectedValues.splice(index, 1);
+    this._selectedValues = [...this._selectedValues];
+  }
 
   get selectedOptions() {
-	return this.selectedValues.map((value)=> {
-		return  this.options.find(option => value === option.value)
-	})
+    return this.selectedValues.map((value) => {
+      return this.options.find((option) => value === option.value);
+    });
   }
 
   get showOptions() {
@@ -62,7 +73,9 @@ export default class Combobox extends LightningElement {
   }
 
   get optionsToShow() {
-	return this.filteredOptions.filter(option => !this.selectedValues.includes(option.value))
+    return this.filteredOptions.filter(
+      (option) => !this.selectedValues.includes(option.value)
+    );
   }
 
   get labels() {
