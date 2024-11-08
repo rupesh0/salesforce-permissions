@@ -5,11 +5,23 @@ public with sharing class CommonController {
     for (PermissionSet ps : [
       SELECT Id, label
       FROM PermissionSet
-      WHERE IsCustom = TRUE
+      WHERE IsOwnedByProfile = FALSE
     ]) {
       ComboboxOption option = new ComboboxOption();
       option.value = ps.Id;
       option.label = ps.label;
+      options.add(option);
+    }
+    return options;
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static List<ComboboxOption> getProfileOptions() {
+    List<ComboboxOption> options = new List<ComboboxOption>();
+    for (Profile pro : [SELECT Id, Name FROM Profile]) {
+      ComboboxOption option = new ComboboxOption();
+      option.value = pro.Id;
+      option.label = pro.Name;
       options.add(option);
     }
     return options;

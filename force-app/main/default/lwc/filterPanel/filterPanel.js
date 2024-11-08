@@ -22,8 +22,4 @@ export default class FilterPanel extends LightningElement {
       new CustomEvent("apply", { bubbles: true, composed: true })
     );
   }
-
-  get labels() {
-    return { permisionSet: "Permission set", profile: "Profile" };
-  }
 }
