@@ -6,6 +6,7 @@ export default class Toolbar extends LightningElement {
   @api objectCount = 0;
   @api fieldCount = 0;
   @api isFilterButtonSelected = false;
+  @api filterValues;
 
   isFilterPanelOpen = false;
 
