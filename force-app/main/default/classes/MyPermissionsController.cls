@@ -2,23 +2,14 @@ public with sharing class MyPermissionsController {
   @AuraEnabled
   public static PermissionDetail getCurrentUsersDetails() {
     try {
+      List<PermissionSet> permissionSets = PermissionSetSelector.newInstance()
+        .getCurrentUsersPermissionSets();
+
       PermissionDetail pd = new PermissionDetail();
       pd.currentUsersProfileId = UserInfo.getProfileId();
-      pd.currentUsersPermissionSetIds = new List<Id>{};
-
-      for (PermissionSet ps : [
-        SELECT Id
-        FROM PermissionSet
-        WHERE
-          IsCustom = TRUE
-          AND Id IN (
-            SELECT PermissionSetId
-            FROM PermissionSetAssignment
-            WHERE AssigneeId = :UserInfo.getUserId()
-          )
-      ]) {
-        pd.currentUsersPermissionSetIds.add(ps.Id);
-      }
+      pd.currentUsersPermissionSetIds = new List<Id>(
+        new Map<Id, PermissionSet>(permissionSets).keySet()
+      );
 
       return pd;
     } catch (Exception e) {
