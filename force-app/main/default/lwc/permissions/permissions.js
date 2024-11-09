@@ -33,15 +33,19 @@ export default class Permissions extends LightningElement {
       this.isLoading = true;
       this.filterController.loadFromLocalStorage();
       this.state.objInfo = await loadObjectInfo();
-      const [fieldInfo] = await Promise.all([
-        loadFields(this.state.objInfo),
-        this.filterController.isValid() &&
+      const promises = [loadFields(this.state.objInfo)];
+      if (this.filterController.isValid()) {
+        promises.push(
           loadPermissions(
             this.filterController.currentFilters,
             this.state.objInfo
           )
-      ]);
+        );
+      }
+      const [fieldInfo, permissions] = await Promise.all(promises);
       this.state.fieldInfo = fieldInfo;
+      this.state.objPermissions = permissions?.[0] ?? [];
+      this.state.fieldPermissions = permissions?.[1] ?? [];
       processData(this.state);
       this.showTable = true;
     } catch (ex) {
