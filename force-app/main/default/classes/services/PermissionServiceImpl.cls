@@ -25,21 +25,8 @@ public with sharing class PermissionServiceImpl implements PermissionService.API
   public Map<String, PermissionService.ObjectPermissionDTO> getObjectPermissions(
     PermissionRequest request
   ) {
-    List<ObjectPermissions> ops = [
-      SELECT
-        SobjectType,
-        PermissionsRead,
-        PermissionsCreate,
-        PermissionsEdit,
-        PermissionsDelete,
-        PermissionsViewAllRecords,
-        PermissionsModifyAllRecords
-      FROM ObjectPermissions
-      WHERE
-        (ParentId IN :request.permissionSetIds
-        OR Parent.ProfileId IN :request.profileIds)
-        AND SobjectType IN :request.objectApiNames
-    ];
+    List<ObjectPermissions> ops = ObjectPermissionsSelector.newInstance()
+      .getPermissionsByPermissionRequest(request);
 
     Map<String, PermissionService.ObjectPermissionDTO> result = new Map<String, PermissionService.ObjectPermissionDTO>();
     for (ObjectPermissions op : ops) {
