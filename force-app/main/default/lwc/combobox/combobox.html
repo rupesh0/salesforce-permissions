@@ -39,7 +39,7 @@
           <template if:true={showOptions}>
             <div
               id="listbox-id"
-              class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid"
+              class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid slds-scrollable dropdown-height"
               role="listbox"
             >
               <ul
@@ -71,6 +71,9 @@
     </div>
   </div>
   <div if:true={selectedOptions.length} class="slds-box_xx-small">
-    <lightning-pill-container items={selectedOptions} onitemremove={handleItemRemove} ></lightning-pill-container>
+    <lightning-pill-container
+      items={selectedOptions}
+      onitemremove={handleItemRemove}
+    ></lightning-pill-container>
   </div>
 </template>
