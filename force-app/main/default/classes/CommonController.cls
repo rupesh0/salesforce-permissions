@@ -18,7 +18,9 @@ public with sharing class CommonController {
   @AuraEnabled(cacheable=true)
   public static List<ComboboxOption> getProfileOptions() {
     List<ComboboxOption> options = new List<ComboboxOption>();
-    for (Profile pro : [SELECT Id, Name FROM Profile]) {
+    List<Profile> profiles = ProfileSelector.newInstance().getAllProfiles();
+
+    for (Profile pro : profiles) {
       ComboboxOption option = new ComboboxOption();
       option.value = pro.Id;
       option.label = pro.Name;
