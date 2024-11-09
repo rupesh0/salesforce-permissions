@@ -2,14 +2,8 @@ public with sharing class PermissionServiceImpl implements PermissionService.API
   public Map<String, PermissionService.FieldPermissionDTO> getFieldPermissions(
     PermissionRequest request
   ) {
-    List<FieldPermissions> fps = [
-      SELECT SobjectType, Field, PermissionsRead, PermissionsEdit
-      FROM FieldPermissions
-      WHERE
-        (ParentId IN :request.permissionSetIds
-        OR Parent.ProfileId IN :request.profileIds)
-        AND SobjectType IN :request.objectApiNames
-    ];
+    List<FieldPermissions> fps = FieldPermissionsSelector.newInstance()
+      .getPermissionsByPermissionRequest(request);
 
     Map<String, PermissionService.FieldPermissionDTO> result = new Map<String, PermissionService.FieldPermissionDTO>();
     for (FieldPermissions fp : fps) {
