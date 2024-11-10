@@ -106,10 +106,7 @@ export default class Permissions extends LightningElement {
 
   handleSearch({ detail }) {
     const grid = this.template.querySelector("c-permission-table");
-    grid.selectedObject = null;
-    grid.objectPermissions = this.state.objPermissions.filter((fp) =>
-      fp.label.toLocaleLowerCase().includes(detail.toLocaleLowerCase())
-    );
+    grid.applySearchFilterOnObject(detail);
   }
 
   get filterController() {

@@ -17,7 +17,10 @@
           <th>{labels.viewAll}</th>
           <th>{labels.modifyAll}</th>
         </tr>
-        <template for:each={objectPermissions} for:item="objectPermission">
+        <template
+          for:each={objPermissionsToDisplay}
+          for:item="objectPermission"
+        >
           <tr key={objectPermission.apiName}>
             <td>
               <input

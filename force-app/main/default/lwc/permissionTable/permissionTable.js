@@ -15,20 +15,19 @@ export default class PermissionTable extends LightningElement {
     this._objectPermissions = value.map((v) => JSON.parse(JSON.stringify(v)));
   }
 
-  @api get selectedObject() {
-    return this._selectedObject;
-  }
-  set selectedObject(value) {
+  @api
+  applySearchFilterOnObject(searchTerm) {
     this.clearSelection();
-    this._selectedObject = value;
+    this.searchTerm = searchTerm;
   }
 
   _fieldPermissions = [];
   _objectPermissions = [];
-  _selectedObject = null;
+  selectedObject = null;
+  searchTerm = "";
 
   handleObjectChange(event) {
-    this._selectedObject = event.target.dataset.id;
+    this.selectedObject = event.target.dataset.id;
   }
 
   clearSelection() {
@@ -38,7 +37,9 @@ export default class PermissionTable extends LightningElement {
     if (ele) {
       ele.checked = false;
     }
+    this.selectedObject = null;
   }
+
   get labels() {
     return {
       label: "Label",
@@ -50,6 +51,16 @@ export default class PermissionTable extends LightningElement {
       viewAll: "View All",
       modifyAll: "Modify All"
     };
+  }
+
+  get objPermissionsToDisplay() {
+    if (!this.searchTerm) {
+      return this.objectPermissions;
+    }
+
+    return this.objectPermissions.filter((op) =>
+      op.label.toLocaleLowerCase().includes(this.searchTerm.toLocaleLowerCase())
+    );
   }
 
   get fieldPermissionsToDisplay() {
