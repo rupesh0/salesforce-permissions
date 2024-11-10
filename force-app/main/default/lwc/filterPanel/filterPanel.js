@@ -1,4 +1,10 @@
 import { LightningElement, api } from "lwc";
+import {
+  ApplyEvent,
+  ClearEvent,
+  ResetEvent,
+  FilterChangeEvent
+} from "./events";
 
 export default class FilterPanel extends LightningElement {
   @api filterValues;
@@ -16,26 +22,18 @@ export default class FilterPanel extends LightningElement {
   }
 
   dispatchFilterChangeEvent(detail) {
-    this.dispatchEvent(
-      new CustomEvent("filterchange", { detail, bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new FilterChangeEvent(detail));
   }
 
   handleResetClick() {
-    this.dispatchEvent(
-      new CustomEvent("reset", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new ResetEvent());
   }
 
   handleClearClick() {
-    this.dispatchEvent(
-      new CustomEvent("clear", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new ClearEvent());
   }
 
   handleApplyClick() {
-    this.dispatchEvent(
-      new CustomEvent("apply", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new ApplyEvent());
   }
 }
