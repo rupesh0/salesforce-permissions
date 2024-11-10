@@ -15,23 +15,23 @@
       </div>
     </div>
     <footer class="slds-popover__footer">
-      <div class="slds-grid slds-grid_align-spread">
-        <lightning-button
-          class="slds-col"
-          label="Clear"
-          onclick={handleClearClick}
-        ></lightning-button>
-        <lightning-button
-          class="slds-col"
-          label="Reset"
-          onclick={handleResetClick}
-        ></lightning-button>
-        <lightning-button
-          class="slds-col"
-          variant="brand"
-          label="Apply"
-          onclick={handleApplyClick}
-        ></lightning-button>
+      <div class="slds-grid">
+        <div class="slds-col_bump-left">
+          <lightning-button
+            label="Clear"
+            onclick={handleClearClick}
+          ></lightning-button>
+          <lightning-button
+            class="slds-m-horizontal_xx-small"
+            label="Reset"
+            onclick={handleResetClick}
+          ></lightning-button>
+          <lightning-button
+            variant="brand"
+            label="Apply"
+            onclick={handleApplyClick}
+          ></lightning-button>
+        </div>
       </div>
     </footer>
   </section>

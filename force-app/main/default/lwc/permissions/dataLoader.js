@@ -30,11 +30,11 @@ function loadFieldPermissions(filters, objInfo, loadFieldP) {
 
   Promise.all(promises)
     .then((results) => {
-      let a = {};
-      results.forEach((d) => {
-        a = { ...a, ...d };
+      let allFields = {};
+      results.forEach((fields) => {
+        allFields = { ...allFields, ...fields };
       });
-      loadFieldP.resolve(a);
+      loadFieldP.resolve(allFields);
     })
     .catch((error) => {
       loadFieldP.reject(error);
@@ -57,11 +57,11 @@ function loadObjectPermissions(filters, objInfo, loadObjP) {
 
   Promise.all(promises)
     .then((results) => {
-      let a = {};
-      results.forEach((d) => {
-        a = { ...a, ...d };
+      let allObjs = {};
+      results.forEach((objs) => {
+        allObjs = { ...allObjs, ...objs };
       });
-      loadObjP.resolve(a);
+      loadObjP.resolve(allObjs);
     })
     .catch((error) => {
       loadObjP.reject(error);
