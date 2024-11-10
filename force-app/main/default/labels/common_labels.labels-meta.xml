@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>common_label_permissions</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Permissions.</shortDescription>
+        <value>Permissions</value>
+    </labels>
+    <labels>
+        <fullName>common_label_x_objects</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label x number of Objects.</shortDescription>
+        <value>{0} Objects</value>
+    </labels>
+    <labels>
+        <fullName>common_label_x_fields</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label x number of Fields.</shortDescription>
+        <value>{0} Fields</value>
+    </labels>
+    <labels>
+        <fullName>common_label_permission_set</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Permission Set.</shortDescription>
+        <value>Permission Set</value>
+    </labels>
+    <labels>
+        <fullName>common_label_profile</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Profile.</shortDescription>
+        <value>Profile</value>
+    </labels>
+    <labels>
+        <fullName>common_label_clear</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Clear.</shortDescription>
+        <value>Clear</value>
+    </labels>
+    <labels>
+        <fullName>common_label_reset</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Reset.</shortDescription>
+        <value>Reset</value>
+    </labels>
+    <labels>
+        <fullName>common_label_apply</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Apply.</shortDescription>
+        <value>Apply</value>
+    </labels>
+    <labels>
+        <fullName>common_label_search_place_holder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Search Placeholder.</shortDescription>
+        <value>Search...</value>
+    </labels>
+    <labels>
+        <fullName>common_label_search_object_holder</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Common label Search Object Placeholder.</shortDescription>
+        <value>Search Object...</value>
+    </labels>
+    <labels>
+        <fullName>common_label_label</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Label.</shortDescription>
+        <value>Label</value>
+    </labels>
+    <labels>
+        <fullName>common_label_API_name</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label API name.</shortDescription>
+        <value>API Name</value>
+    </labels>
+    <labels>
+        <fullName>common_label_read</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Read.</shortDescription>
+        <value>Read</value>
+    </labels>
+    <labels>
+        <fullName>common_label_create</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Create.</shortDescription>
+        <value>Create</value>
+    </labels>
+    <labels>
+        <fullName>common_label_delete</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Delete.</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>common_label_edit</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Edit.</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>common_label_view_all</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label View All.</shortDescription>
+        <value>View All</value>
+    </labels>
+    <labels>
+        <fullName>common_label_modify_all</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Modify All.</shortDescription>
+        <value>Modify All</value>
+    </labels>
+</CustomLabels>
