@@ -1,11 +1,10 @@
 import { api, LightningElement } from "lwc";
-import { FilterButtonClickEvent, SearchEvent } from "./events";
+import { SearchEvent } from "./events";
 import { MIN_SEARCH_LENGTH } from "./constants";
 
 export default class Toolbar extends LightningElement {
   @api objectCount = 0;
   @api fieldCount = 0;
-  @api isFilterButtonSelected = false;
   @api filterValues;
 
   isFilterPanelOpen = false;
@@ -18,7 +17,6 @@ export default class Toolbar extends LightningElement {
   }
 
   handleFilterButtonClick() {
-    this.dispatchEvent(new FilterButtonClickEvent());
     this.isFilterPanelOpen = !this.isFilterPanelOpen;
   }
 

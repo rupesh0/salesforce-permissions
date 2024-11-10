@@ -10,14 +10,4 @@ class SearchEvent extends CustomEvent {
   }
 }
 
-class FilterButtonClickEvent extends CustomEvent {
-  constructor() {
-    super(FilterButtonClickEvent.type);
-  }
-
-  static get type() {
-    return "filterbuttonclick";
-  }
-}
-
-export { SearchEvent, FilterButtonClickEvent };
+export { SearchEvent };

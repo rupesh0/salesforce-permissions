@@ -23,7 +23,6 @@ export default class Permissions extends LightningElement {
 
   localStorageKey = "myPermissions";
   _filterController;
-  isFilterButtonSelected = false;
   error;
   showTable;
   isLoading = true;
@@ -103,10 +102,6 @@ export default class Permissions extends LightningElement {
   hanldeFilterValueChange(event) {
     event.stopPropagation();
     this.filterController.updateFilters(event.detail);
-  }
-
-  handleFilterButtonClick() {
-    this.isFilterButtonSelected = !this.isFilterButtonSelected;
   }
 
   handleSearch({ detail }) {
