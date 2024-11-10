@@ -11,9 +11,6 @@ export default class ProfileCombobox extends LightningElement {
   @wire(getProfileOptions)
   getPermissionSetOptionsCallback({ error, data }) {
     if (error) {
-      this.options = this.selectedValues.map((value) => {
-        return { value, label: value };
-      });
       const reduceError = reduceErrors(error);
       Toast.show(
         {

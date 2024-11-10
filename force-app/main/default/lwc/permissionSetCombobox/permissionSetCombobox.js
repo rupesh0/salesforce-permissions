@@ -12,9 +12,6 @@ export default class PermissionSetCombobox extends LightningElement {
   @wire(getPermissionSetOptions)
   getPermissionSetOptionsCallback({ error, data }) {
     if (error) {
-      this.options = this.selectedValues.map((value) => {
-        return { value, label: value };
-      });
       const reduceError = reduceErrors(error);
       Toast.show(
         {

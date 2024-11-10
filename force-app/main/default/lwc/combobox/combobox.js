@@ -64,11 +64,14 @@ export default class Combobox extends LightningElement {
   }
 
   get selectedOptions() {
-    return this.selectedValues
-      .map((value) => {
-        return this.options.find((option) => value === option.value);
-      })
-      .filter((value) => !!value);
+    return this.selectedValues.map((value) => {
+      return (
+        this.options.find((option) => value === option.value) ?? {
+          value,
+          label: value
+        }
+      );
+    });
   }
 
   get showOptions() {
