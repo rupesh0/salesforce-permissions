@@ -1,6 +1,7 @@
 import { LightningElement } from "lwc";
 import { reduceErrors } from "c/ldsUtils";
 import getCurrentUsersDetails from "@salesforce/apex/MyPermissionsController.getCurrentUsersDetails";
+import { LABELS } from "./i18n";
 
 export default class MyPermissions extends LightningElement {
   filters;
@@ -23,9 +24,6 @@ export default class MyPermissions extends LightningElement {
   }
 
   get labels() {
-    return {
-      error: "An error occurred while fetching the current user details.",
-      loading: "Loading"
-    };
+    return LABELS;
   }
 }

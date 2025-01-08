@@ -2,7 +2,7 @@
   <div style="position: relative">
     <lightning-spinner
       lwc:if={isLoading}
-      alternative-text={labels.loading}
+      alternative-text={labels.common_label_loading}
       size="medium"
       variant="base"
     ></lightning-spinner>
@@ -10,7 +10,7 @@
       <c-permissions lwc:if={filters} filters={filters}></c-permissions>
       <c-illustration
         lwc:if={error}
-        title={labels.error}
+        title={labels.permissions_label_error_failed_to_fatch_current_user_details}
         sub-title={error}
       ></c-illustration>
     </article>
