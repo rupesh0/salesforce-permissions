@@ -1,10 +1,11 @@
 import { LightningElement, api } from "lwc";
 import { debounce } from "./utils";
 import { ChangeEvent } from "./events";
+import { LABELS } from "./i18n";
 
 export default class Combobox extends LightningElement {
   @api label;
-  @api placeholder = "Search...";
+  @api placeholder = LABELS.common_label_search_place_holder;
 
   @api get options() {
     return this._allOptions;
@@ -85,8 +86,6 @@ export default class Combobox extends LightningElement {
   }
 
   get labels() {
-    return {
-      iconAltText: "Search"
-    };
+    return LABELS;
   }
 }
