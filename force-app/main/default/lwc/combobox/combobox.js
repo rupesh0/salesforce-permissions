@@ -1,5 +1,5 @@
 import { LightningElement, api } from "lwc";
-import { debounce } from "./utils";
+import { debounce } from "c/utils";
 import { ChangeEvent } from "./events";
 import { LABELS } from "./i18n";
 

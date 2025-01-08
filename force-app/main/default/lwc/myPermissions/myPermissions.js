@@ -1,5 +1,5 @@
 import { LightningElement } from "lwc";
-import { reduceErrors } from "c/ldsUtils";
+import { reduceErrors } from "c/utils";
 import getCurrentUsersDetails from "@salesforce/apex/MyPermissionsController.getCurrentUsersDetails";
 import { LABELS } from "./i18n";
 

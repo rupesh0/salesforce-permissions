@@ -2,6 +2,7 @@ import { api, LightningElement } from "lwc";
 import { SearchEvent } from "./events";
 import { MIN_SEARCH_LENGTH } from "./constants";
 import { LABELS } from "./i18n";
+import { stringFormat } from "c/utils";
 
 export default class Toolbar extends LightningElement {
   @api objectCount = 0;
@@ -26,7 +27,10 @@ export default class Toolbar extends LightningElement {
   }
 
   get subTitles() {
-    return [`${this.objectCount} Objects`, `${this.fieldCount} Fields`];
+    return [ 
+      stringFormat(LABELS.common_label_x_objects, this.objectCount),
+      stringFormat(LABELS.common_label_x_fields, this.fieldCount)
+     ];
   }
 
   get minInputLength() {

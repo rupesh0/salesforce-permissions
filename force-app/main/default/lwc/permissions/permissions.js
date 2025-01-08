@@ -1,7 +1,7 @@
 import { api, LightningElement, track } from "lwc";
 import Toast from "lightning/toast";
 import { loadPermissions, loadObjectInfo, loadFields } from "./dataLoader.js";
-import { reduceErrors } from "c/ldsUtils";
+import { reduceErrors } from "c/utils";
 import { processData } from "./dataProcessor.js";
 import { makeFilters } from "./filters.js";
 import { LABELS } from "./i18n.js";

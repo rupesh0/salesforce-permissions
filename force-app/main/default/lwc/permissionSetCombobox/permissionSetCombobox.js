@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from "lwc";
 import getPermissionSetOptions from "@salesforce/apex/CommonController.getPermissionSetOptions";
-import { reduceErrors } from "c/ldsUtils";
+import { reduceErrors } from "c/utils";
 import Toast from "lightning/toast";
 import { LABELS } from "./i18n";
 

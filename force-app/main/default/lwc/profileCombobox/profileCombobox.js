@@ -1,6 +1,6 @@
 import { LightningElement, wire, api } from "lwc";
 import getProfileOptions from "@salesforce/apex/CommonController.getProfileOptions";
-import { reduceErrors } from "c/ldsUtils";
+import { reduceErrors } from "c/utils";
 import Toast from "lightning/toast";
 import { LABELS } from "./i18n";
 
