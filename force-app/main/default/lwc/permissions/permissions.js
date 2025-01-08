@@ -4,6 +4,7 @@ import { loadPermissions, loadObjectInfo, loadFields } from "./dataLoader.js";
 import { reduceErrors } from "c/ldsUtils";
 import { processData } from "./dataProcessor.js";
 import { makeFilters } from "./filters.js";
+import { LABELS } from "./i18n.js";
 
 export default class Permissions extends LightningElement {
   @api
@@ -86,7 +87,7 @@ export default class Permissions extends LightningElement {
       } catch (e) {
         Toast.show(
           {
-            label: "Error on filter apply",
+            label: LABELS.permissions_label_error_unable_to_apply_filters,
             message: reduceErrors(e),
             mode: "sticky",
             variant: "error"
@@ -117,12 +118,7 @@ export default class Permissions extends LightningElement {
   }
 
   get labels() {
-    return {
-      error: "An error occurred while loading the data: {0}",
-      runTimeError: "Run Time Error",
-      permissions: "Permissions",
-      loading: "Loading"
-    };
+    return LABELS;
   }
 
   get objectCount() {

@@ -2,13 +2,16 @@
   <div style="position: relative">
     <lightning-spinner
       lwc:if={isLoading}
-      alternative-text={labels.loading}
+      alternative-text={labels.common_label_loading}
       size="medium"
       variant="base"
     ></lightning-spinner>
 
     <div lwc:if={error}>
-      <c-illustration title={labels.error} sub-title={error}></c-illustration>
+      <c-illustration
+        title={labels.permissions_label_error_failed_to_fatch_data}
+        sub-title={error}
+      ></c-illustration>
     </div>
     <div lwc:else class="slds-grid slds-grid_vertical">
       <c-toolbar
