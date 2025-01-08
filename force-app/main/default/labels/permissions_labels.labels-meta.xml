@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName
+    >permissions_label_error_failed_to_fatch_current_user_details</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return current user details.</shortDescription>
+        <value
+    >An error occurred while fetching the current user details.</value>
+    </labels>
+    <labels>
+        <fullName>permissions_label_error_failed_to_fatch_data</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return data.</shortDescription>
+        <value>An error occurred while loading the data: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>permissions_label_error_unable_to_apply_filters</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return filter data.</shortDescription>
+        <value>Error on filter apply</value>
+    </labels>
+    <labels>
+        <fullName
+    >permissions_label_error_on_fetch_permission_set_combobox_options</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return permission set options.</shortDescription>
+        <value>Error in loading Permission Set combobox options</value>
+    </labels>
+    <labels>
+        <fullName
+    >permissions_label_error_on_fetch_profile_combobox_options</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return profile options.</shortDescription>
+        <value>Error in loading Profile combobox options</value>
+    </labels>
+</CustomLabels>
