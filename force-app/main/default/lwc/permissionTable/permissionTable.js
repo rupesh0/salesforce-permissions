@@ -1,4 +1,5 @@
 import { LightningElement, api } from "lwc";
+import { LABELS } from "./i18n";
 
 export default class PermissionTable extends LightningElement {
   @api get fieldPermissions() {
@@ -41,16 +42,7 @@ export default class PermissionTable extends LightningElement {
   }
 
   get labels() {
-    return {
-      label: "Label",
-      apiName: "API Name",
-      read: "Read",
-      create: "Create",
-      edit: "Edit",
-      delete: "Delete",
-      viewAll: "View All",
-      modifyAll: "Modify All"
-    };
+    return LABELS;
   }
 
   get objPermissionsToDisplay() {

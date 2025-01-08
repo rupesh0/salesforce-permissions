@@ -8,14 +8,14 @@
       <table border="1">
         <tr>
           <th></th>
-          <th style="width: 100px">{labels.label}</th>
-          <th style="width: 100px">{labels.apiName}</th>
-          <th>{labels.read}</th>
-          <th>{labels.create}</th>
-          <th>{labels.edit}</th>
-          <th>{labels.delete}</th>
-          <th>{labels.viewAll}</th>
-          <th>{labels.modifyAll}</th>
+          <th style="width: 100px">{labels.common_label_label}</th>
+          <th style="width: 100px">{labels.common_label_API_name}</th>
+          <th>{labels.common_label_read}</th>
+          <th>{labels.common_label_create}</th>
+          <th>{labels.common_label_edit}</th>
+          <th>{labels.common_label_delete}</th>
+          <th>{labels.common_label_view_all}</th>
+          <th>{labels.common_label_modify_all}</th>
         </tr>
         <template
           for:each={objPermissionsToDisplay}
@@ -82,10 +82,10 @@
     <div class="slds-col slds-scrollable_y" style="height: 300px">
       <table border="1">
         <tr>
-          <th>{labels.label}</th>
-          <th>{labels.apiName}</th>
-          <th>{labels.read}</th>
-          <th>{labels.edit}</th>
+          <th>{labels.common_label_label}</th>
+          <th>{labels.common_label_API_name}</th>
+          <th>{labels.common_label_read}</th>
+          <th>{labels.common_label_edit}</th>
         </tr>
         <template
           for:each={fieldPermissionsToDisplay}
