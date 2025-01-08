@@ -36,6 +36,13 @@
         <value>Profile</value>
     </labels>
     <labels>
+        <fullName>common_label_filter</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Filter.</shortDescription>
+        <value>Filter</value>
+    </labels>
+    <labels>
         <fullName>common_label_clear</fullName>
         <language>en_US</language>
         <protected>true</protected>
@@ -55,6 +62,20 @@
         <protected>true</protected>
         <shortDescription>Common label Apply.</shortDescription>
         <value>Apply</value>
+    </labels>
+    <labels>
+        <fullName>common_label_search</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Search.</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>common_label_loading</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Common label Loading.</shortDescription>
+        <value>Loading</value>
     </labels>
     <labels>
         <fullName>common_label_search_place_holder</fullName>
