@@ -5,6 +5,7 @@ import {
   ResetEvent,
   FilterChangeEvent
 } from "./events";
+import { LABELS } from "./i18n";
 
 export default class FilterPanel extends LightningElement {
   @api filterValues;
@@ -35,5 +36,9 @@ export default class FilterPanel extends LightningElement {
 
   handleApplyClick() {
     this.dispatchEvent(new ApplyEvent());
+  }
+
+  get labels() {
+    return LABELS;
   }
 }
