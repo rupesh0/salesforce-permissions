@@ -6,7 +6,7 @@
           <div class="slds-page-header__name-title">
             <h1>
               <span class="slds-page-header__title slds-truncate" title={title}
-                >{labels.title}</span
+                >{labels.common_label_permissions}</span
               >
             </h1>
           </div>
@@ -34,7 +34,7 @@
             <lightning-input
               variant="label-hidden"
               type="search"
-              placeholder={labels.inputPlaceHolder}
+              placeholder={labels.common_label_search_object_holder}
               min-length={minInputLength}
               oncommit={handleInputChange}
             ></lightning-input>
@@ -45,7 +45,7 @@
                 icon-name="utility:filterList"
                 selected={isFilterPanelOpen}
                 onclick={handleFilterButtonClick}
-                alternative-text={labels.filter}
+                alternative-text={labels.common_label_filter}
               ></lightning-button-icon-stateful>
               <div
                 lwc:if={isFilterPanelOpen}

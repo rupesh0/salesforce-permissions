@@ -1,6 +1,7 @@
 import { api, LightningElement } from "lwc";
 import { SearchEvent } from "./events";
 import { MIN_SEARCH_LENGTH } from "./constants";
+import { LABELS } from "./i18n";
 
 export default class Toolbar extends LightningElement {
   @api objectCount = 0;
@@ -21,11 +22,7 @@ export default class Toolbar extends LightningElement {
   }
 
   get labels() {
-    return {
-      title: "Permissions",
-      inputPlaceHolder: "Enter Object Name",
-      filter: "Filter"
-    };
+    return LABELS;
   }
 
   get subTitles() {
