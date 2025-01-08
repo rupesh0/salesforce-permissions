@@ -2,6 +2,7 @@ import { LightningElement, wire, api } from "lwc";
 import getProfileOptions from "@salesforce/apex/CommonController.getProfileOptions";
 import { reduceErrors } from "c/ldsUtils";
 import Toast from "lightning/toast";
+import { LABELS } from "./i18n";
 
 export default class ProfileCombobox extends LightningElement {
   @api selectedValues;
@@ -14,7 +15,8 @@ export default class ProfileCombobox extends LightningElement {
       const reduceError = reduceErrors(error);
       Toast.show(
         {
-          label: "Error in loading Profile combobox options",
+          label:
+            LABELS.permissions_label_error_on_fetch_profile_combobox_options,
           message: reduceError,
           mode: "sticky",
           variant: "error"
@@ -27,6 +29,6 @@ export default class ProfileCombobox extends LightningElement {
   }
 
   get labels() {
-    return { profile: "Profile" };
+    return LABELS;
   }
 }
