@@ -103,6 +103,7 @@ export default class Permissions extends LightningElement {
   hanldeFilterValueChange(event) {
     event.stopPropagation();
     this.filterController.updateFilters(event.detail);
+    this.refs.toolbar.filterValues = this.filters;
   }
 
   handleSearch({ detail }) {
