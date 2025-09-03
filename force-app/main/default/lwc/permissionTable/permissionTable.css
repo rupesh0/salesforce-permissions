@@ -9,3 +9,9 @@
 .text_align_center {
   text-align: center;
 }
+
+.table_header {
+  background-color: #f4f6f9;
+  position: sticky;
+  top: 0;
+}
