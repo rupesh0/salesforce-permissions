@@ -54,17 +54,34 @@ public with sharing class PermissionsController {
   @AuraEnabled
   public static List<ObjectInfoDTO> getObjectInfos() {
     try {
+      List<String> objectApiNames = new List<String>();
+      for (Standard_Object_To_Show_In_Permissions__mdt record : [
+        SELECT Object_API_Name__c
+        FROM Standard_Object_To_Show_In_Permissions__mdt
+      ]) {
+        objectApiNames.add(record.Object_API_Name__c);
+      }
+
       List<ObjectInfoDTO> result = new List<ObjectInfoDTO>();
 
       Map<String, sObjectType> objsInOrg = schema.getGlobalDescribe();
       for (sObjectType sobjectType : objsInOrg.values()) {
         DescribeSObjectResult dsr = sobjectType.getDescribe();
 
-        ObjectInfoDTO info = new ObjectInfoDTO();
-        info.apiName = dsr.getName();
-        info.label = dsr.getLabel();
+        Boolean include =
+          dsr.isCustom() || objectApiNames.contains(dsr.getName());
+        include =
+          include &&
+          !dsr.isCustomSetting() &&
+          !dsr.getName().endsWith('__mdt');
 
-        result.add(info);
+        if (include) {
+          ObjectInfoDTO info = new ObjectInfoDTO();
+          info.apiName = dsr.getName();
+          info.label = dsr.getLabel();
+
+          result.add(info);
+        }
       }
       return result;
     } catch (Exception e) {
