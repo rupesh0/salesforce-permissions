@@ -31,6 +31,10 @@ export default class PermissionTable extends LightningElement {
     this.selectedObject = event.target.dataset.id;
   }
 
+  preventDefaultCheck(event) {
+    event.preventDefault();
+  }
+
   clearSelection() {
     const ele = this.template.querySelector(
       '[data-id="' + this.selectedObject + '"]'
