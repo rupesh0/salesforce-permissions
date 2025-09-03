@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Standard Object To Show In Permissions</label>
+    <pluralLabel>Standard Objects To Show In Permissions</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
