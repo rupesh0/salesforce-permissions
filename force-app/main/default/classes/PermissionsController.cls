@@ -1,4 +1,19 @@
 public with sharing class PermissionsController {
+  private static List<String> fieldApiNamesToExclude = new List<String>{
+    'Id',
+    'IsDeleted',
+    'MasterRecordId',
+    'OwnerId',
+    'CreatedDate',
+    'CreatedById',
+    'LastModifiedDate',
+    'LastModifiedById',
+    'SystemModstamp',
+    'LastActivityDate',
+    'LastReferencedDate',
+    'LastViewedDate'
+  };
+
   @AuraEnabled
   public static Map<String, PermissionService.FieldPermissionDTO> getFieldPermissions(
     PermissionRequest request
@@ -27,6 +42,13 @@ public with sharing class PermissionsController {
       List<FieldInfoDTO> result = new List<FieldInfoDTO>();
 
       Map<String, sObjectType> objsInOrg = schema.getGlobalDescribe();
+      List<String> fieldsToExclude = new List<String>();
+      for (Field_To_Exclude_In_Permissions__mdt record : [
+        SELECT Field__c
+        FROM Field_To_Exclude_In_Permissions__mdt
+      ]) {
+        fieldsToExclude.add(record.Field__c);
+      }
 
       for (String objectApiName : objectApiNames) {
         DescribeSObjectResult dsr = objsInOrg.get(objectApiName).getDescribe();
@@ -36,13 +58,20 @@ public with sharing class PermissionsController {
         for (SObjectField field : fields) {
           DescribeFieldResult dfr = field.getDescribe();
 
-          FieldInfoDTO info = new FieldInfoDTO();
-          info.apiName = dfr.getName();
-          info.label = dfr.getLabel();
-          info.objectApiName = objectApiName;
-          info.field = objectApiName + '.' + info.apiName;
+          String fieldName = objectApiName + '.' + dfr.getName();
+          Boolean include =
+            !fieldsToExclude.contains(fieldName) &&
+            !fieldApiNamesToExclude.contains(dfr.getName());
 
-          result.add(info);
+          if (include) {
+            FieldInfoDTO info = new FieldInfoDTO();
+            info.apiName = dfr.getName();
+            info.label = dfr.getLabel();
+            info.objectApiName = objectApiName;
+            info.field = fieldName;
+
+            result.add(info);
+          }
         }
       }
       return result;
