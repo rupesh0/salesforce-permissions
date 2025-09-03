@@ -8,14 +8,18 @@
       <table border="1">
         <tr>
           <th></th>
-          <th style="width: 100px">{labels.common_label_label}</th>
-          <th style="width: 100px">{labels.common_label_API_name}</th>
-          <th>{labels.common_label_read}</th>
-          <th>{labels.common_label_create}</th>
-          <th>{labels.common_label_edit}</th>
-          <th>{labels.common_label_delete}</th>
-          <th>{labels.common_label_view_all}</th>
-          <th>{labels.common_label_modify_all}</th>
+          <th style="width: 100px" class="text_align_center">
+            {labels.common_label_label}
+          </th>
+          <th style="width: 100px" class="text_align_center">
+            {labels.common_label_API_name}
+          </th>
+          <th class="text_align_center">{labels.common_label_read}</th>
+          <th class="text_align_center">{labels.common_label_create}</th>
+          <th class="text_align_center">{labels.common_label_edit}</th>
+          <th class="text_align_center">{labels.common_label_delete}</th>
+          <th class="text_align_center">{labels.common_label_view_all}</th>
+          <th class="text_align_center">{labels.common_label_modify_all}</th>
         </tr>
         <template
           for:each={objPermissionsToDisplay}
@@ -25,16 +29,18 @@
             <td>
               <input
                 type="radio"
+                class="width_full"
                 name="select"
                 data-id={objectPermission.apiName}
                 onclick={handleObjectChange}
               />
             </td>
-            <td>{objectPermission.label}</td>
-            <td>{objectPermission.apiName}</td>
+            <td class="text_align_center">{objectPermission.label}</td>
+            <td class="text_align_center">{objectPermission.apiName}</td>
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.isReadable}
               />
@@ -42,6 +48,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.isCreateable}
               />
@@ -49,6 +56,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.isEditable}
               />
@@ -56,6 +64,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.isDeletable}
               />
@@ -63,6 +72,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.viewAll}
               />
@@ -70,6 +80,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={objectPermission.modifyAll}
               />
@@ -82,21 +93,22 @@
     <div class="slds-col slds-scrollable_y" style="height: 300px">
       <table border="1">
         <tr>
-          <th>{labels.common_label_label}</th>
-          <th>{labels.common_label_API_name}</th>
-          <th>{labels.common_label_read}</th>
-          <th>{labels.common_label_edit}</th>
+          <th class="text_align_center">{labels.common_label_label}</th>
+          <th class="text_align_center">{labels.common_label_API_name}</th>
+          <th class="text_align_center">{labels.common_label_read}</th>
+          <th class="text_align_center">{labels.common_label_edit}</th>
         </tr>
         <template
           for:each={fieldPermissionsToDisplay}
           for:item="fieldPermission"
         >
           <tr key={fieldPermission.apiName}>
-            <td>{fieldPermission.label}</td>
-            <td>{fieldPermission.apiName}</td>
+            <td class="text_align_center">{fieldPermission.label}</td>
+            <td class="text_align_center">{fieldPermission.apiName}</td>
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={fieldPermission.isReadable}
               />
@@ -104,6 +116,7 @@
             <td>
               <input
                 type="checkbox"
+                class="width_full"
                 readonly
                 checked={fieldPermission.isEditable}
               />
