@@ -1,10 +1,7 @@
 <template>
   <!-- sldsValidatorIgnore -->
-  <div class="slds-grid slds-border_top" style="height: 100%">
-    <div
-      class="slds-col slds-border_right slds-scrollable_y"
-      style="height: 300px"
-    >
+  <div class="container slds-border_top" style="height: 100%">
+    <div lwc:ref="leftPane" class="slds-scrollable" style={leftStyle}>
       <table border="1">
         <tr class="table_header">
           <th></th>
@@ -89,8 +86,16 @@
         </template>
       </table>
     </div>
-    <div class="spiltter"></div>
-    <div class="slds-col slds-scrollable_y" style="height: 300px">
+    <div
+      lwc:ref="splitter"
+      class="slds-border_right slds-border_left slds-border_top slds-border_bottom splitter"
+      role="separator"
+      aria-orientation="vertical"
+      aria-valuenow={leftWidth}
+      tabindex="0"
+      onpointerdown={onPointerDownHandler}
+    ></div>
+    <div lwc:ref="rightPane" class="slds-scrollable" style={rightStyle}>
       <table border="1">
         <tr class="table_header">
           <th class="text_align_center">{labels.common_label_label}</th>

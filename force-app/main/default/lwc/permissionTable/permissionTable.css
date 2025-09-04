@@ -1,7 +1,16 @@
-.spiltter {
-  height: 100%;
-  cursor: ew-resize;
+.container {
+  display: flex;
+  border: 1px solid var(--lwc-colorBorder, #ddd);
 }
+
+.splitter {
+  flex-basis: 0.5%;
+  background: var(--lwc-colorBackground, #e5e5e5);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+
 .width_full {
   width: 100%;
 }
