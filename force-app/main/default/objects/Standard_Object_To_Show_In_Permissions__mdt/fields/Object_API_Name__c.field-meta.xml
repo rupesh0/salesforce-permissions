@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Field__c</fullName>
+    <fullName>Object_API_Name__c</fullName>
     <caseSensitive>false</caseSensitive>
-    <description
-  >Field Name should be &quot;&lt;sObjectAPIName&gt;.&lt;fieldAPIName&gt;&quot;</description>
+    <description>Object API Name</description>
     <externalId>false</externalId>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Field</label>

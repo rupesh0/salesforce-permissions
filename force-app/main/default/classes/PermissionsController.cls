@@ -42,13 +42,6 @@ public with sharing class PermissionsController {
       List<FieldInfoDTO> result = new List<FieldInfoDTO>();
 
       Map<String, sObjectType> objsInOrg = schema.getGlobalDescribe();
-      List<String> fieldsToExclude = new List<String>();
-      for (Field_To_Exclude_In_Permissions__mdt record : [
-        SELECT Field__c
-        FROM Field_To_Exclude_In_Permissions__mdt
-      ]) {
-        fieldsToExclude.add(record.Field__c);
-      }
 
       for (String objectApiName : objectApiNames) {
         DescribeSObjectResult dsr = objsInOrg.get(objectApiName).getDescribe();
@@ -57,18 +50,14 @@ public with sharing class PermissionsController {
 
         for (SObjectField field : fields) {
           DescribeFieldResult dfr = field.getDescribe();
-
-          String fieldName = objectApiName + '.' + dfr.getName();
-          Boolean include =
-            !fieldsToExclude.contains(fieldName) &&
-            !fieldApiNamesToExclude.contains(dfr.getName());
+          Boolean include = !fieldApiNamesToExclude.contains(dfr.getName());
 
           if (include) {
             FieldInfoDTO info = new FieldInfoDTO();
             info.apiName = dfr.getName();
             info.label = dfr.getLabel();
             info.objectApiName = objectApiName;
-            info.field = fieldName;
+            info.field = objectApiName + '.' + dfr.getName();
 
             result.add(info);
           }
