@@ -31,6 +31,8 @@
           lwc:if={showTable}
           field-permissions={state.fieldPermissions}
           object-permissions={state.objPermissions}
+          onupdateobjectcount={handleUpdateObjectCount}
+          onupdatefieldcount={handleUpdateFieldCount}
         ></c-permission-table>
       </div>
     </div>

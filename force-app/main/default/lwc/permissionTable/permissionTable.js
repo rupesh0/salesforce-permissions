@@ -1,6 +1,7 @@
 import { LightningElement, api } from "lwc";
 import { LABELS } from "./i18n";
 import { DEFAULT_LEFT_WIDTH, GRID_HEIGHT, STORAGE_KEY } from "./constants";
+import { UpdateFieldCountEvent, UpdateObjectCountEvent } from "./events";
 
 export default class PermissionTable extends LightningElement {
   @api get fieldPermissions() {
@@ -8,6 +9,9 @@ export default class PermissionTable extends LightningElement {
   }
   set fieldPermissions(value) {
     this._fieldPermissions = value.map((v) => JSON.parse(JSON.stringify(v)));
+    this.dispatchEvent(
+      new UpdateFieldCountEvent(this.fieldPermissionsToDisplay.length)
+    );
   }
 
   @api get objectPermissions() {
@@ -15,12 +19,28 @@ export default class PermissionTable extends LightningElement {
   }
   set objectPermissions(value) {
     this._objectPermissions = value.map((v) => JSON.parse(JSON.stringify(v)));
+    this.dispatchEvent(
+      new UpdateObjectCountEvent(this.objPermissionsToDisplay.length)
+    );
   }
 
   @api
   applySearchFilterOnObject(searchTerm) {
-    this.clearSelection();
+    this.clearCheckbox();
     this.searchTerm = searchTerm;
+    this.dispatchEvent(
+      new UpdateObjectCountEvent(this.objPermissionsToDisplay.length)
+    );
+    this.dispatchEvent(new UpdateFieldCountEvent(0));
+  }
+
+  @api
+  clearSelection() {
+    this.clearCheckbox();
+    this.dispatchEvent(
+      new UpdateObjectCountEvent(this.objPermissionsToDisplay.length)
+    );
+    this.dispatchEvent(new UpdateFieldCountEvent(0));
   }
 
   _fieldPermissions = [];
@@ -31,8 +51,21 @@ export default class PermissionTable extends LightningElement {
   minPercent = 10;
   maxPercent = 90;
 
+  clearCheckbox() {
+    const ele = this.template.querySelector(
+      '[data-id="' + this.selectedObject + '"]'
+    );
+    if (ele) {
+      ele.checked = false;
+    }
+    this.selectedObject = null;
+  }
+
   handleObjectChange(event) {
     this.selectedObject = event.target.dataset.id;
+    this.dispatchEvent(
+      new UpdateFieldCountEvent(this.fieldPermissionsToDisplay.length)
+    );
   }
 
   preventDefaultCheck(event) {
@@ -74,16 +107,6 @@ export default class PermissionTable extends LightningElement {
 
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
-  }
-
-  clearSelection() {
-    const ele = this.template.querySelector(
-      '[data-id="' + this.selectedObject + '"]'
-    );
-    if (ele) {
-      ele.checked = false;
-    }
-    this.selectedObject = null;
   }
 
   get leftStyle() {

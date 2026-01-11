@@ -27,6 +27,8 @@ export default class Permissions extends LightningElement {
   error;
   showTable;
   isLoading = true;
+  objectCount = 0;
+  fieldCount = 0;
 
   async connectedCallback() {
     try {
@@ -84,6 +86,7 @@ export default class Permissions extends LightningElement {
         this.state.fieldPermissions = fieldPermissions;
         processData(this.state);
         this.filterController.saveToLocalStorage();
+        this.template.querySelector("c-permission-table").clearSelection();
       } catch (e) {
         Toast.show(
           {
@@ -111,6 +114,14 @@ export default class Permissions extends LightningElement {
     grid.applySearchFilterOnObject(detail);
   }
 
+  handleUpdateObjectCount(event) {
+    this.objectCount = event.detail.objectCount;
+  }
+
+  handleUpdateFieldCount(event) {
+    this.fieldCount = event.detail.fieldCount;
+  }
+
   get filterController() {
     if (!this._filterController) {
       this._filterController = makeFilters(this.localStorageKey);
@@ -120,13 +131,5 @@ export default class Permissions extends LightningElement {
 
   get labels() {
     return LABELS;
-  }
-
-  get objectCount() {
-    return this.state.objInfo.length;
-  }
-
-  get fieldCount() {
-    return this.state.fieldInfo.length;
   }
 }
