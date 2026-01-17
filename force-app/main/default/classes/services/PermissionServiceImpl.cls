@@ -45,4 +45,21 @@ public with sharing class PermissionServiceImpl implements PermissionService.API
     }
     return result;
   }
+
+  public Set<Id> getUnifiedPermissionSetIds(
+    List<Id> profileIds,
+    List<Id> permissionSetIds
+  ) {
+    Set<Id> unifiedIds = new Set<Id>(permissionSetIds);
+
+    unifiedIds.addAll(
+      PermissionSetSelector.newInstance()
+        .getPermissionSetIdsByProfileIds(profileIds)
+    );
+
+    // Add the provided Permission Set IDs
+    unifiedIds.addAll(permissionSetIds);
+
+    return unifiedIds;
+  }
 }

@@ -44,4 +44,13 @@
     >Error message when server failed to return profile options.</shortDescription>
         <value>Error in loading Profile combobox options</value>
     </labels>
+    <labels>
+        <fullName
+    >permissions_label_error_on_fetch_assigned_app_permissions</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription
+    >Error message when server failed to return assigned app permissions.</shortDescription>
+        <value>Error in loading Assigned App Permissions</value>
+    </labels>
 </CustomLabels>

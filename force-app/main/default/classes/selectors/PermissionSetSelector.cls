@@ -28,4 +28,14 @@ public with sharing class PermissionSetSelector implements IPermissionSetSelecto
         )
     ];
   }
+
+  public Set<Id> getPermissionSetIdsByProfileIds(List<Id> profileIds) {
+    List<PermissionSet> permissionSets = [
+      SELECT Id
+      FROM PermissionSet
+      WHERE IsOwnedByProfile = TRUE AND ProfileId IN :profileIds
+    ];
+
+    return new Map<Id, PermissionSet>(permissionSets).keySet();
+  }
 }

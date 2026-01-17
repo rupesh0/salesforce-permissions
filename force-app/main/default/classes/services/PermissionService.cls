@@ -14,6 +14,10 @@ public with sharing class PermissionService {
     Map<String, ObjectPermissionDTO> getObjectPermissions(
       PermissionRequest request
     );
+    Set<Id> getUnifiedPermissionSetIds(
+      List<Id> profileIds,
+      List<Id> permissionSetIds
+    );
   }
 
   public static Map<String, FieldPermissionDTO> getFieldPermissions(
@@ -26,6 +30,13 @@ public with sharing class PermissionService {
     PermissionRequest request
   ) {
     return service().getObjectPermissions(request);
+  }
+
+  public static Set<Id> getUnifiedPermissionSetIds(
+    List<Id> profileIds,
+    List<Id> permissionSetIds
+  ) {
+    return service().getUnifiedPermissionSetIds(profileIds, permissionSetIds);
   }
 
   public with sharing class ObjectPermissionDTO {
