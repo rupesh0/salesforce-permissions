@@ -1,3 +1,10 @@
 <template>
-    
+  <lightning-datatable
+    height="400px"
+    key-field="appId"
+    data={permissionApps}
+    columns={columns}
+    hide-checkbox-column
+    show-row-number-column
+  ></lightning-datatable>
 </template>

@@ -53,4 +53,11 @@
     >Error message when server failed to return assigned app permissions.</shortDescription>
         <value>Error in loading Assigned App Permissions</value>
     </labels>
+    <labels>
+        <fullName>permissions_label_app_name</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label for App Name column</shortDescription>
+        <value>App Name</value>
+    </labels>
 </CustomLabels>

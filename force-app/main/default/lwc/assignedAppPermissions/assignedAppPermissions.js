@@ -7,7 +7,7 @@ import { LABELS } from "./i18n";
 import getAssignedAppPermissions from "@salesforce/apex/AssignedAppPermissionsController.getAssignedAppPermissions";
 
 export default class AssignedAppPermissions extends LightningElement {
-  @api permissionSetIds = [];
+  @api permissionSetIds = ["0PSHy000001WWnAOAW"];
   @api profileIds = [];
 
   permissionApps = [];
@@ -33,10 +33,20 @@ export default class AssignedAppPermissions extends LightningElement {
           this
         );
       } else if (data) {
-        this.permissionApps = JSON.parse(JSON.stringify(data));
+        this.permissionApps = data;
       }
       refreshApex(this.assignedAppPermissionsResult);
     }
     console.log("Assigned App Permissions Data:", result);
+  }
+
+  get columns() {
+    return [
+      {
+        label: LABELS.permissions_label_app_name,
+        fieldName: "label",
+        type: "text"
+      }
+    ];
   }
 }
