@@ -1,52 +1,43 @@
 import { api, LightningElement, track } from "lwc";
-import Toast from "lightning/toast";
 import { loadPermissions, loadObjectInfo, loadFields } from "./dataLoader.js";
 import { reduceErrors, stringFormat } from "c/utils";
 import { processData } from "./dataProcessor.js";
-import { makeFilters } from "./filters.js";
 import { LABELS } from "./i18n.js";
 
 export default class Permissions extends LightningElement {
-  @api title;
-
-  @api
-  get showToolbar() {
-    return this._showToolbar;
-  }
-  set showToolbar(value) {
-    this._showToolbar = Boolean(value);
-  }
-
-  @api
-  get filters() {
-    return this.filterController.currentFilters;
-  }
-  set filters(value) {
-    this._showToolbar = true;
-    this.filterController.setDefaults(value);
-    if (this.state.objInfo.length > 0) {
-      this.applyFilter();
-    }
-  }
-
   @api
   get profileIds() {
-    return this.filterController.currentFilters.profileIds;
+    return this._profileIds;
   }
   set profileIds(value) {
-    this.filterController.updateFilters({ profileIds: value || [] });
-    if (this.state.objInfo.length > 0) {
+    this._profileIds = value || [];
+    if (this._isInitialized && this.state.objInfo.length > 0) {
       this.applyFilter();
     }
   }
 
   @api
   get permissionSetIds() {
-    return this.filterController.currentFilters.permissionSetIds;
+    return this._permissionSetIds;
   }
   set permissionSetIds(value) {
-    this.filterController.updateFilters({ permissionSetIds: value || [] });
-    if (this.state.objInfo.length > 0) {
+    this._permissionSetIds = value || [];
+    if (this._isInitialized && this.state.objInfo.length > 0) {
+      this.applyFilter();
+    }
+  }
+
+  @api
+  get filters() {
+    return {
+      profileIds: this._profileIds,
+      permissionSetIds: this._permissionSetIds
+    };
+  }
+  set filters(value) {
+    this._profileIds = value?.profileIds || [];
+    this._permissionSetIds = value?.permissionSetIds || [];
+    if (this._isInitialized && this.state.objInfo.length > 0) {
       this.applyFilter();
     }
   }
@@ -70,12 +61,12 @@ export default class Permissions extends LightningElement {
     fieldPermissions: []
   };
 
-  localStorageKey = "myPermissions";
-  _filterController;
-  _showToolbar = false;
+  _profileIds = [];
+  _permissionSetIds = [];
   _searchTerm = "";
+  _isInitialized = false;
   error;
-  showTable;
+  showTable = false;
   isLoading = true;
   objectCount = 0;
   fieldCount = 0;
@@ -84,13 +75,15 @@ export default class Permissions extends LightningElement {
     try {
       this.isLoading = true;
       this.dispatchLoading(true);
-      this.filterController.loadFromLocalStorage();
       this.state.objInfo = await loadObjectInfo();
       const promises = [loadFields(this.state.objInfo)];
-      if (this.filterController.isValid()) {
+      if (this.hasFilters) {
         promises.push(
           loadPermissions(
-            this.filterController.currentFilters,
+            {
+              profileIds: this._profileIds,
+              permissionSetIds: this._permissionSetIds
+            },
             this.state.objInfo
           )
         );
@@ -101,6 +94,13 @@ export default class Permissions extends LightningElement {
       this.state.fieldPermissions = permissions?.[1] ?? [];
       processData(this.state);
       this.showTable = true;
+      this._isInitialized = true;
+      if (this._searchTerm) {
+        const grid = this.template?.querySelector("c-permission-table");
+        if (grid) {
+          grid.applySearchFilterOnObject(this._searchTerm);
+        }
+      }
     } catch (ex) {
       this.error = reduceErrors(ex);
       this.dispatchEvent(
@@ -116,69 +116,51 @@ export default class Permissions extends LightningElement {
     }
   }
 
-  handleResetFilter(event) {
-    event?.stopPropagation();
-    this.filterController.resetFilters();
-    this.applyFilter();
-  }
-
-  handleApplyFilter(event) {
-    event?.stopPropagation();
-    this.applyFilter();
-  }
-
-  handleClearFilter(event) {
-    event?.stopPropagation();
-    this.filterController.clearFilters();
-    this.applyFilter();
+  get hasFilters() {
+    return (
+      (this._profileIds && this._profileIds.length > 0) ||
+      (this._permissionSetIds && this._permissionSetIds.length > 0)
+    );
   }
 
   async applyFilter() {
-    if (this.filterController.isValid()) {
-      try {
-        this.isLoading = true;
-        this.dispatchLoading(true);
+    try {
+      this.isLoading = true;
+      this.dispatchLoading(true);
+      if (this.hasFilters) {
         const [objPermissions, fieldPermissions] = await loadPermissions(
-          this.filterController.currentFilters,
+          {
+            profileIds: this._profileIds,
+            permissionSetIds: this._permissionSetIds
+          },
           this.state.objInfo
         );
         this.state.objPermissions = objPermissions;
         this.state.fieldPermissions = fieldPermissions;
-        processData(this.state);
-        this.filterController.saveToLocalStorage();
-        const grid = this.template?.querySelector("c-permission-table");
-        if (grid) {
-          grid.clearSelection();
-        }
-      } catch (e) {
-        Toast.show(
-          {
-            label: LABELS.permissions_label_error_unable_to_apply_filters,
-            message: reduceErrors(e),
-            mode: "sticky",
-            variant: "error"
-          },
-          this
-        );
-      } finally {
-        this.isLoading = false;
-        this.dispatchLoading(false);
+      } else {
+        this.state.objPermissions = [];
+        this.state.fieldPermissions = [];
       }
-    }
-  }
-
-  hanldeFilterValueChange(event) {
-    event?.stopPropagation();
-    this.filterController.updateFilters(event.detail);
-    if (this.refs.toolbar) {
-      this.refs.toolbar.filterValues = this.filters;
-    }
-  }
-
-  handleSearch({ detail }) {
-    const grid = this.template.querySelector("c-permission-table");
-    if (grid) {
-      grid.applySearchFilterOnObject(detail);
+      processData(this.state);
+      const grid = this.template?.querySelector("c-permission-table");
+      if (grid) {
+        grid.clearSelection();
+        if (this._searchTerm) {
+          grid.applySearchFilterOnObject(this._searchTerm);
+        }
+      }
+    } catch (e) {
+      this.error = reduceErrors(e);
+      this.dispatchEvent(
+        new CustomEvent("error", {
+          detail: { error: this.error },
+          bubbles: true,
+          composed: true
+        })
+      );
+    } finally {
+      this.isLoading = false;
+      this.dispatchLoading(false);
     }
   }
 
@@ -217,13 +199,6 @@ export default class Permissions extends LightningElement {
       stringFormat(LABELS.common_label_x_objects, this.objectCount),
       stringFormat(LABELS.common_label_x_fields, this.fieldCount)
     ];
-  }
-
-  get filterController() {
-    if (!this._filterController) {
-      this._filterController = makeFilters(this.localStorageKey);
-    }
-    return this._filterController;
   }
 
   get labels() {

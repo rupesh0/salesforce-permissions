@@ -7,6 +7,7 @@ import { LABELS } from "./i18n";
 export default class PermissionContainer extends LightningElement {
   @api permissionType = PERMISSION_TYPES.OBJECTS;
   @api title;
+  @api storageKeyPrefix = "permission_filters";
 
   @api
   get defaultFilters() {
@@ -16,7 +17,10 @@ export default class PermissionContainer extends LightningElement {
     this._defaultFilters = value;
     if (this._filterController) {
       this._filterController.setDefaults(value);
-      this.appliedFilters = this._filterController.currentFilters;
+      this.appliedFilters = { ...this._filterController.currentFilters };
+      if (this.refs.toolbar) {
+        this.refs.toolbar.filterValues = this._filterController.currentFilters;
+      }
     }
   }
 
@@ -115,7 +119,8 @@ export default class PermissionContainer extends LightningElement {
 
   get filterController() {
     if (!this._filterController) {
-      const key = `permission_filters_${this.permissionType || "default"}`;
+      const prefix = this.storageKeyPrefix || "permission_filters";
+      const key = `${prefix}_${this.permissionType || "default"}`;
       this._filterController = makeFilters(key);
       if (this._defaultFilters) {
         this._filterController.setDefaults(this._defaultFilters);
