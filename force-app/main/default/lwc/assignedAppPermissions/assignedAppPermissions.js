@@ -1,43 +1,89 @@
-import { LightningElement, api, wire } from "lwc";
-import { refreshApex } from "@salesforce/apex";
-import Toast from "lightning/toast";
+import { api, LightningElement, wire } from "lwc";
 import { reduceErrors } from "c/utils";
+import getAssignedAppPermissions from "@salesforce/apex/AssignedAppPermissionsController.getAssignedAppPermissions";
 import { LABELS } from "./i18n";
 
-import getAssignedAppPermissions from "@salesforce/apex/AssignedAppPermissionsController.getAssignedAppPermissions";
-
 export default class AssignedAppPermissions extends LightningElement {
-  @api permissionSetIds = ["0PSHy000001WWnAOAW"];
+  @api permissionSetIds = [];
   @api profileIds = [];
+  @api searchTerm = "";
 
-  permissionApps = [];
-  assignedAppPermissionsResult;
+  records = [];
+  error;
+  isLoading = false;
 
   @wire(getAssignedAppPermissions, {
     permissionSetIds: "$permissionSetIds",
     profileIds: "$profileIds"
   })
-  getAssignedAppPermissionsCallback(result) {
-    this.assignedAppPermissionsResult = result;
-    const { error, data } = result;
-    if (error || data) {
-      if (error) {
-        Toast.show(
-          {
-            label:
-              LABELS.permissions_label_error_on_fetch_assigned_app_permissions,
-            message: reduceErrors(error),
-            mode: "sticky",
-            variant: "error"
-          },
-          this
-        );
-      } else if (data) {
-        this.permissionApps = data;
-      }
-      refreshApex(this.assignedAppPermissionsResult);
+  getAssignedAppPermissionsCallback({ error, data }) {
+    this.isLoading = false;
+    this.dispatchLoading(false);
+
+    if (error) {
+      this.error = reduceErrors(error);
+      this.records = [];
+      this.dispatchSubtitle(["0 Apps"]);
+      this.dispatchEvent(
+        new CustomEvent("error", {
+          detail: { error: this.error },
+          bubbles: true,
+          composed: true
+        })
+      );
+    } else if (data) {
+      this.error = undefined;
+      this.records = data;
+      this.updateSubtitle();
     }
-    console.log("Assigned App Permissions Data:", result);
+  }
+
+  renderedCallback() {
+    this.updateSubtitle();
+  }
+
+  dispatchLoading(isLoading) {
+    this.dispatchEvent(
+      new CustomEvent("loadingchange", {
+        detail: { isLoading },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  dispatchSubtitle(subTitles) {
+    this.dispatchEvent(
+      new CustomEvent("subtitlechange", {
+        detail: { subTitles },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  updateSubtitle() {
+    const total = this.records.length;
+    const filtered = this.filteredRecords.length;
+    if (this.searchTerm && this.searchTerm.trim().length > 0) {
+      this.dispatchSubtitle([`${filtered} of ${total} Apps`]);
+    } else {
+      this.dispatchSubtitle([`${total} Apps`]);
+    }
+  }
+
+  get filteredRecords() {
+    if (!this.searchTerm || !this.searchTerm.trim()) {
+      return this.records;
+    }
+    const term = this.searchTerm.toLowerCase();
+    return this.records.filter((row) =>
+      row.label?.toLowerCase().includes(term)
+    );
+  }
+
+  get hasNoRecords() {
+    return !this.isLoading && this.filteredRecords.length === 0;
   }
 
   get columns() {

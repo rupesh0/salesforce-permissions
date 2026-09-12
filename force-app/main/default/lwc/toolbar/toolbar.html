@@ -5,8 +5,10 @@
         <div class="slds-page-header__name">
           <div class="slds-page-header__name-title">
             <h1>
-              <span class="slds-page-header__title slds-truncate" title={title}
-                >{labels.common_label_permissions}</span
+              <span
+                class="slds-page-header__title slds-truncate"
+                title={pageTitle}
+                >{pageTitle}</span
               >
             </h1>
           </div>
@@ -20,7 +22,7 @@
       <div class="slds-page-header__col-meta">
         <div class="slds-page-header__meta-text">
           <span class="slds-list_horizontal slds-wrap slds-has-dividers_right">
-            <template for:each={subTitles} for:item="subTitle">
+            <template for:each={subTitleList} for:item="subTitle">
               <span key={subTitle} class="slds-item divider-adjust"
                 >{subTitle}</span
               >
@@ -34,9 +36,10 @@
             <lightning-input
               variant="label-hidden"
               type="search"
-              placeholder={labels.common_label_search_object_holder}
+              placeholder={searchPlaceholderText}
               min-length={minInputLength}
               oncommit={handleInputChange}
+              onchange={handleInputChange}
             ></lightning-input>
           </div>
           <div class="slds-page-header__control">
@@ -51,7 +54,13 @@
                 lwc:if={isFilterPanelOpen}
                 class="slds-is-absolute popover-placement"
               >
-                <c-filter-panel filter-values={filterValues}></c-filter-panel>
+                <c-filter-panel
+                  filter-values={filterValues}
+                  onapply={handleApply}
+                  onclear={handleClear}
+                  onreset={handleReset}
+                  onfilterchange={handleFilterChange}
+                ></c-filter-panel>
               </div>
             </div>
           </div>

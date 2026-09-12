@@ -1,0 +1,203 @@
+<template>
+  <div style="position: relative">
+    <lightning-spinner
+      lwc:if={isLoading}
+      alternative-text={labels.common_label_loading}
+      size="medium"
+      variant="base"
+    ></lightning-spinner>
+
+    <div lwc:if={error}>
+      <c-illustration
+        title={labels.permissions_label_error_failed_to_fatch_data}
+        sub-title={error}
+      ></c-illustration>
+    </div>
+
+    <div lwc:else class="slds-grid slds-grid_vertical">
+      <c-toolbar
+        lwc:ref="toolbar"
+        class="slds-col"
+        title={pageTitle}
+        sub-titles={subTitles}
+        filter-values={currentFilters}
+        onsearch={handleSearch}
+        onfilterchange={handleFilterValueChange}
+        onreset={handleResetFilter}
+        onclear={handleClearFilter}
+        onapply={handleApplyFilter}
+      ></c-toolbar>
+
+      <div class="slds-col slds-m-top_x-small">
+        <template lwc:if={isObjects}>
+          <c-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-permissions>
+        </template>
+
+        <template lwc:elseif={isApexClass}>
+          <c-apex-class-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-apex-class-permissions>
+        </template>
+
+        <template lwc:elseif={isVfPage}>
+          <c-vf-page-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-vf-page-permissions>
+        </template>
+
+        <template lwc:elseif={isCustomSettings}>
+          <c-custom-settings
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-custom-settings>
+        </template>
+
+        <template lwc:elseif={isCustomMetadata}>
+          <c-custom-metadata-types
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-custom-metadata-types>
+        </template>
+
+        <template lwc:elseif={isExternalDataSources}>
+          <c-external-data-sources
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-external-data-sources>
+        </template>
+
+        <template lwc:elseif={isFlow}>
+          <c-flow-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-flow-permissions>
+        </template>
+
+        <template lwc:elseif={isNamedCredentials}>
+          <c-named-credentials
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-named-credentials>
+        </template>
+
+        <template lwc:elseif={isAssignedApps}>
+          <c-assigned-app-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-assigned-app-permissions>
+        </template>
+
+        <template lwc:elseif={isAssignedConnectedApps}>
+          <c-assigned-connected-app
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-assigned-connected-app>
+        </template>
+
+        <template lwc:elseif={isAppPermissions}>
+          <c-app-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-app-permissions>
+        </template>
+
+        <template lwc:elseif={isSystemPermissions}>
+          <c-system-permissions
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-system-permissions>
+        </template>
+
+        <template lwc:elseif={isOrgWideEmail}>
+          <c-org-wide-email-address-access
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-org-wide-email-address-access>
+        </template>
+
+        <template lwc:elseif={isStandardInvocableActions}>
+          <c-standard-invocable-action-access
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-standard-invocable-action-access>
+        </template>
+
+        <template lwc:elseif={isServiceProviders}>
+          <c-service-providers
+            profile-ids={appliedProfileIds}
+            permission-set-ids={appliedPermissionSetIds}
+            search-term={searchTerm}
+            onsubtitlechange={handleSubtitleChange}
+            onloadingchange={handleLoadingChange}
+            onerror={handleChildError}
+          ></c-service-providers>
+        </template>
+
+        <template lwc:else>
+          <slot></slot>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>

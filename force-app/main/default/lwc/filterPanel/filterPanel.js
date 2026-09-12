@@ -10,6 +10,14 @@ import { LABELS } from "./i18n";
 export default class FilterPanel extends LightningElement {
   @api filterValues;
 
+  get permissionSetIds() {
+    return this.filterValues?.permissionSetIds || [];
+  }
+
+  get profileIds() {
+    return this.filterValues?.profileIds || [];
+  }
+
   handlePermissionSetChange(event) {
     event.stopPropagation();
     this.dispatchFilterChangeEvent({
