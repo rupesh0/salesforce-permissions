@@ -15,22 +15,6 @@
         </div>
       </div>
       <div class="slds-page-header__col-actions">
-        <div class="slds-page-header__controls"></div>
-      </div>
-    </div>
-    <div class="slds-page-header__row">
-      <div class="slds-page-header__col-meta">
-        <div class="slds-page-header__meta-text">
-          <span class="slds-list_horizontal slds-wrap slds-has-dividers_right">
-            <template for:each={subTitleList} for:item="subTitle">
-              <span key={subTitle} class="slds-item divider-adjust"
-                >{subTitle}</span
-              >
-            </template>
-          </span>
-        </div>
-      </div>
-      <div class="slds-page-header__col-controls">
         <div class="slds-page-header__controls">
           <div class="slds-page-header__control">
             <lightning-input
@@ -65,6 +49,22 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="slds-page-header__row">
+      <div class="slds-page-header__col-meta">
+        <div class="slds-page-header__meta-text">
+          <span class="slds-list_horizontal slds-wrap slds-has-dividers_right">
+            <template for:each={subTitleList} for:item="subTitle">
+              <span key={subTitle} class="slds-item divider-adjust"
+                >{subTitle}</span
+              >
+            </template>
+          </span>
+        </div>
+      </div>
+      <div class="slds-page-header__col-controls">
+        <div class="slds-page-header__controls"></div>
       </div>
     </div>
   </div>
