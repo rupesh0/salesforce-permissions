@@ -1,6 +1,21 @@
 <template>
   <div class="slds-m-top_medium">
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Empty state when no permissions are selected -->
+    <div
+      lwc:if={isNoneVisible}
+      class="slds-card slds-p-around_large slds-text-align_center slds-m-bottom_medium"
+    >
+      <p class="slds-text-heading_small slds-text-color_weak">
+        No permissions selected. Check one or more boxes above to view
+        permissions.
+      </p>
+    </div>
+
+    <!-- Object & Field Permissions -->
+    <div
+      lwc:if={isObjectVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Object & Field Permissions
       </h2>
@@ -11,7 +26,11 @@
       ></c-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- System Permissions -->
+    <div
+      lwc:if={isSystemVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         System Permissions
       </h2>
@@ -22,7 +41,11 @@
       ></c-system-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- App Permissions -->
+    <div
+      lwc:if={isAppsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         App Permissions
       </h2>
@@ -33,7 +56,11 @@
       ></c-app-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Apex Class Access -->
+    <div
+      lwc:if={isApexClassVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Apex Class Access
       </h2>
@@ -44,7 +71,11 @@
       ></c-apex-class-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Visualforce Page Access -->
+    <div
+      lwc:if={isVfPageVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Visualforce Page Access
       </h2>
@@ -55,7 +86,11 @@
       ></c-vf-page-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Custom Setting Definitions -->
+    <div
+      lwc:if={isCustomSettingsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Custom Setting Definitions
       </h2>
@@ -66,7 +101,11 @@
       ></c-custom-settings>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Custom Metadata Types -->
+    <div
+      lwc:if={isCustomMetadataVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Custom Metadata Types
       </h2>
@@ -77,7 +116,11 @@
       ></c-custom-metadata-types>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Flow Access -->
+    <div
+      lwc:if={isFlowVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">Flow Access</h2>
       <c-flow-permissions
         profile-ids={profileIds}
@@ -86,7 +129,11 @@
       ></c-flow-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Named Credential Access -->
+    <div
+      lwc:if={isNamedCredentialsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Named Credential Access
       </h2>
@@ -97,7 +144,11 @@
       ></c-named-credentials>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Organization-Wide Email Address Access -->
+    <div
+      lwc:if={isOrgWideEmailVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Organization-Wide Email Address Access
       </h2>
@@ -108,7 +159,11 @@
       ></c-org-wide-email-address-access>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Standard Invocable Action Type Access -->
+    <div
+      lwc:if={isInvocableActionsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Standard Invocable Action Type Access
       </h2>
@@ -119,7 +174,11 @@
       ></c-standard-invocable-action-access>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Service Providers -->
+    <div
+      lwc:if={isServiceProvidersVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Service Providers
       </h2>
@@ -130,7 +189,11 @@
       ></c-service-providers>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Assigned Apps -->
+    <div
+      lwc:if={isAssignedAppsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Assigned Apps
       </h2>
@@ -141,7 +204,11 @@
       ></c-assigned-app-permissions>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- Assigned Connected Apps -->
+    <div
+      lwc:if={isConnectedAppsVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         Assigned Connected Apps
       </h2>
@@ -152,7 +219,11 @@
       ></c-assigned-connected-app>
     </div>
 
-    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+    <!-- External Data Sources -->
+    <div
+      lwc:if={isDataSourcesVisible}
+      class="slds-card slds-m-bottom_medium slds-p-around_medium"
+    >
       <h2 class="slds-text-heading_medium slds-m-bottom_small">
         External Data Sources
       </h2>

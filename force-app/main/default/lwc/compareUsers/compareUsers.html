@@ -202,6 +202,29 @@
       </div>
     </div>
 
+    <!-- Controls: Search Box & Single Instance of Checkboxes for Both Users -->
+    <div class="slds-p-around_medium slds-border_bottom">
+      <div
+        class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small"
+      >
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_4-of-12"
+        >
+          <lightning-input
+            type="search"
+            variant="label-hidden"
+            placeholder="Search permissions across both users..."
+            value={searchTerm}
+            onchange={handleSearchChange}
+          ></lightning-input>
+        </div>
+      </div>
+      <c-permission-visibility-filter
+        visible-permissions={visiblePermissions}
+        onvisibilitychange={handleVisibilityChange}
+      ></c-permission-visibility-filter>
+    </div>
+
     <!-- Side-by-Side Permissions (Left / Right) -->
     <div class="slds-p-around_medium">
       <div class="slds-grid slds-gutters slds-wrap">
@@ -209,21 +232,27 @@
         <div
           class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_medium"
         >
-          <template lwc:if={user1AppliedFilters}>
-            <c-toolbar
-              title={user1Title}
-              filter-values={user1CurrentFilters}
-              onsearch={handleUser1Search}
-              onfilterchange={handleUser1FilterChange}
-              onapply={handleUser1Apply}
-              onclear={handleUser1ClearFilters}
-              onreset={handleUser1ResetFilters}
-            ></c-toolbar>
+          <template lwc:if={user1Selected}>
+            <div
+              class="slds-card slds-p-around_small slds-m-bottom_small user-header-card"
+            >
+              <div class="slds-grid slds-grid_vertical-align-center">
+                <lightning-icon
+                  icon-name="standard:user"
+                  size="small"
+                  class="slds-m-right_x-small"
+                ></lightning-icon>
+                <h2 class="slds-text-heading_medium slds-truncate">
+                  {user1Title}
+                </h2>
+              </div>
+            </div>
 
             <c-all-permissions
-              profile-ids={user1AppliedProfileIds}
-              permission-set-ids={user1AppliedPermissionSetIds}
-              search-term={user1SearchTerm}
+              profile-ids={user1ProfileIds}
+              permission-set-ids={user1PermissionSetIds}
+              search-term={searchTerm}
+              visible-permissions={visiblePermissions}
             ></c-all-permissions>
           </template>
           <template lwc:else>
@@ -240,21 +269,27 @@
         <div
           class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_medium"
         >
-          <template lwc:if={user2AppliedFilters}>
-            <c-toolbar
-              title={user2Title}
-              filter-values={user2CurrentFilters}
-              onsearch={handleUser2Search}
-              onfilterchange={handleUser2FilterChange}
-              onapply={handleUser2Apply}
-              onclear={handleUser2ClearFilters}
-              onreset={handleUser2ResetFilters}
-            ></c-toolbar>
+          <template lwc:if={user2Selected}>
+            <div
+              class="slds-card slds-p-around_small slds-m-bottom_small user-header-card"
+            >
+              <div class="slds-grid slds-grid_vertical-align-center">
+                <lightning-icon
+                  icon-name="standard:user"
+                  size="small"
+                  class="slds-m-right_x-small"
+                ></lightning-icon>
+                <h2 class="slds-text-heading_medium slds-truncate">
+                  {user2Title}
+                </h2>
+              </div>
+            </div>
 
             <c-all-permissions
-              profile-ids={user2AppliedProfileIds}
-              permission-set-ids={user2AppliedPermissionSetIds}
-              search-term={user2SearchTerm}
+              profile-ids={user2ProfileIds}
+              permission-set-ids={user2PermissionSetIds}
+              search-term={searchTerm}
+              visible-permissions={visiblePermissions}
             ></c-all-permissions>
           </template>
           <template lwc:else>

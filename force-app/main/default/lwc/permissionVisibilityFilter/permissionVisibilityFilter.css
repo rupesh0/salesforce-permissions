@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+
+.permission-toggle-card {
+  background-color: var(--slds-g-color-surface-container, #ffffff);
+  border: 1px solid var(--slds-g-color-border-base, #c9c7c5);
+  border-radius: 4px;
+}
+
+.checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.checkbox-item {
+  flex: 0 0 auto;
+  min-width: 150px;
+}

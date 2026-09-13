@@ -2,15 +2,13 @@ import { LightningElement, track } from "lwc";
 import { debounce } from "c/utils";
 import searchUsers from "@salesforce/apex/CompareUsersController.searchUsers";
 import getUserPermissionDetails from "@salesforce/apex/CompareUsersController.getUserPermissionDetails";
+import { ALL_PERMISSION_KEYS } from "c/permissionVisibilityFilter";
 
 export default class CompareUsers extends LightningElement {
   // User 1 state
   user1SearchTerm = "";
   user1Options = [];
   user1Selected = null;
-  @track user1DefaultFilters = null;
-  @track user1CurrentFilters = null;
-  @track user1AppliedFilters = null;
   showUser1Dropdown = false;
   isUser1Loading = false;
 
@@ -18,11 +16,12 @@ export default class CompareUsers extends LightningElement {
   user2SearchTerm = "";
   user2Options = [];
   user2Selected = null;
-  @track user2DefaultFilters = null;
-  @track user2CurrentFilters = null;
-  @track user2AppliedFilters = null;
   showUser2Dropdown = false;
   isUser2Loading = false;
+
+  // Single instance of search and permission selection applying to both users
+  searchTerm = "";
+  @track visiblePermissions = [...ALL_PERMISSION_KEYS];
 
   connectedCallback() {
     this.fetchInitialUsers();
@@ -36,6 +35,15 @@ export default class CompareUsers extends LightningElement {
     } catch {
       // Ignore initial query error
     }
+  }
+
+  // --- Search & Visibility Handlers ---
+  handleSearchChange(event) {
+    this.searchTerm = event.target.value;
+  }
+
+  handleVisibilityChange(event) {
+    this.visiblePermissions = event.detail.visiblePermissions;
   }
 
   // --- User 1 Event Handlers ---
@@ -69,18 +77,8 @@ export default class CompareUsers extends LightningElement {
     try {
       const details = await getUserPermissionDetails({ userId });
       this.user1Selected = details;
-      const filters = {
-        profileIds: [details.profileId],
-        permissionSetIds: details.permissionSetIds || []
-      };
-      this.user1DefaultFilters = { ...filters };
-      this.user1CurrentFilters = { ...filters };
-      this.user1AppliedFilters = { ...filters };
     } catch {
       this.user1Selected = null;
-      this.user1DefaultFilters = null;
-      this.user1CurrentFilters = null;
-      this.user1AppliedFilters = null;
     } finally {
       this.isUser1Loading = false;
     }
@@ -88,32 +86,7 @@ export default class CompareUsers extends LightningElement {
 
   handleUser1Clear() {
     this.user1Selected = null;
-    this.user1DefaultFilters = null;
-    this.user1CurrentFilters = null;
-    this.user1AppliedFilters = null;
     this.user1SearchTerm = "";
-  }
-
-  handleUser1Search(event) {
-    this.user1SearchTerm = event.detail;
-  }
-
-  handleUser1FilterChange(event) {
-    this.user1CurrentFilters = event.detail;
-  }
-
-  handleUser1Apply() {
-    this.user1AppliedFilters = { ...this.user1CurrentFilters };
-  }
-
-  handleUser1ClearFilters() {
-    this.user1CurrentFilters = { profileIds: [], permissionSetIds: [] };
-    this.user1AppliedFilters = { profileIds: [], permissionSetIds: [] };
-  }
-
-  handleUser1ResetFilters() {
-    this.user1CurrentFilters = { ...this.user1DefaultFilters };
-    this.user1AppliedFilters = { ...this.user1DefaultFilters };
   }
 
   // --- User 2 Event Handlers ---
@@ -147,18 +120,8 @@ export default class CompareUsers extends LightningElement {
     try {
       const details = await getUserPermissionDetails({ userId });
       this.user2Selected = details;
-      const filters = {
-        profileIds: [details.profileId],
-        permissionSetIds: details.permissionSetIds || []
-      };
-      this.user2DefaultFilters = { ...filters };
-      this.user2CurrentFilters = { ...filters };
-      this.user2AppliedFilters = { ...filters };
     } catch {
       this.user2Selected = null;
-      this.user2DefaultFilters = null;
-      this.user2CurrentFilters = null;
-      this.user2AppliedFilters = null;
     } finally {
       this.isUser2Loading = false;
     }
@@ -166,32 +129,7 @@ export default class CompareUsers extends LightningElement {
 
   handleUser2Clear() {
     this.user2Selected = null;
-    this.user2DefaultFilters = null;
-    this.user2CurrentFilters = null;
-    this.user2AppliedFilters = null;
     this.user2SearchTerm = "";
-  }
-
-  handleUser2Search(event) {
-    this.user2SearchTerm = event.detail;
-  }
-
-  handleUser2FilterChange(event) {
-    this.user2CurrentFilters = event.detail;
-  }
-
-  handleUser2Apply() {
-    this.user2AppliedFilters = { ...this.user2CurrentFilters };
-  }
-
-  handleUser2ClearFilters() {
-    this.user2CurrentFilters = { profileIds: [], permissionSetIds: [] };
-    this.user2AppliedFilters = { profileIds: [], permissionSetIds: [] };
-  }
-
-  handleUser2ResetFilters() {
-    this.user2CurrentFilters = { ...this.user2DefaultFilters };
-    this.user2AppliedFilters = { ...this.user2DefaultFilters };
   }
 
   get user1Title() {
@@ -206,19 +144,19 @@ export default class CompareUsers extends LightningElement {
       : "User 2";
   }
 
-  get user1AppliedProfileIds() {
-    return this.user1AppliedFilters?.profileIds || [];
+  get user1ProfileIds() {
+    return this.user1Selected?.profileId ? [this.user1Selected.profileId] : [];
   }
 
-  get user1AppliedPermissionSetIds() {
-    return this.user1AppliedFilters?.permissionSetIds || [];
+  get user1PermissionSetIds() {
+    return this.user1Selected?.permissionSetIds || [];
   }
 
-  get user2AppliedProfileIds() {
-    return this.user2AppliedFilters?.profileIds || [];
+  get user2ProfileIds() {
+    return this.user2Selected?.profileId ? [this.user2Selected.profileId] : [];
   }
 
-  get user2AppliedPermissionSetIds() {
-    return this.user2AppliedFilters?.permissionSetIds || [];
+  get user2PermissionSetIds() {
+    return this.user2Selected?.permissionSetIds || [];
   }
 }

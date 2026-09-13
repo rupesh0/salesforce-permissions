@@ -48,3 +48,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.user-header-card {
+  background-color: var(--slds-g-color-surface-container, #f8f9fb);
+  border: 1px solid var(--slds-g-color-border-base, #dddbda);
+  border-radius: 4px;
+}

@@ -25,10 +25,18 @@
         onreset={handleReset}
       ></c-toolbar>
 
+      <div class="slds-m-top_medium">
+        <c-permission-visibility-filter
+          visible-permissions={visiblePermissions}
+          onvisibilitychange={handleVisibilityChange}
+        ></c-permission-visibility-filter>
+      </div>
+
       <c-all-permissions
         profile-ids={appliedProfileIds}
         permission-set-ids={appliedPermissionSetIds}
         search-term={searchTerm}
+        visible-permissions={visiblePermissions}
       ></c-all-permissions>
     </div>
   </div>
