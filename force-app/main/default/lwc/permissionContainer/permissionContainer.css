@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.slds-card {
+  background-color: var(--slds-g-color-surface-container, #ffffff);
+}
