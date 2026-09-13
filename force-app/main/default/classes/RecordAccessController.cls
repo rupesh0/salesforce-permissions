@@ -381,9 +381,7 @@ public without sharing class RecordAccessController {
           permSetIdsWithViewAll.add(op.ParentId);
         }
       }
-      if (
-        !permSetIdsWithModifyAll.isEmpty() || !permSetIdsWithViewAll.isEmpty()
-      ) {
+      if (!permSetIdsWithModifyAll.isEmpty() || !permSetIdsWithViewAll.isEmpty()) {
         List<PermissionSetAssignment> psAssignments = [
           SELECT AssigneeId, PermissionSetId
           FROM PermissionSetAssignment
@@ -460,7 +458,9 @@ public without sharing class RecordAccessController {
         List<GroupMember> gms = [
           SELECT GroupId, UserOrGroupId
           FROM GroupMember
-          WHERE GroupId IN :groupIdsInShares AND UserOrGroupId IN :userIds
+          WHERE
+            GroupId IN :groupIdsInShares
+            AND UserOrGroupId IN :userIds
         ];
         for (GroupMember gm : gms) {
           if (userToMemberGroups.containsKey(gm.UserOrGroupId)) {
@@ -475,7 +475,9 @@ public without sharing class RecordAccessController {
         for (User u : userRoleMap.values()) {
           if (u.UserRoleId != null) {
             for (Group grp : groupMap.values()) {
-              if (grp.Type == 'Role' && grp.RelatedId == u.UserRoleId) {
+              if (
+                grp.Type == 'Role' && grp.RelatedId == u.UserRoleId
+              ) {
                 userToMemberGroups.get(u.Id).add(grp.Id);
               }
             }
