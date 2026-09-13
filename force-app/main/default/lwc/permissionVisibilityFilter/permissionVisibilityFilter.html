@@ -1,0 +1,36 @@
+<template>
+  <div class="slds-card slds-p-around_small permission-toggle-card">
+    <div
+      class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_x-small"
+    >
+      <div class="slds-text-title_bold slds-text-color_weak">
+        Permissions ({selectedCount} of {totalCount} shown)
+      </div>
+      <lightning-button-group>
+        <lightning-button
+          label="Select All"
+          title="Show all permissions"
+          onclick={handleSelectAll}
+        ></lightning-button>
+        <lightning-button
+          label="Clear All"
+          title="Hide all permissions"
+          onclick={handleClearAll}
+        ></lightning-button>
+      </lightning-button-group>
+    </div>
+    <div class="checkbox-container">
+      <template for:each={permissionOptions} for:item="item">
+        <div key={item.key} class="checkbox-item">
+          <lightning-input
+            type="checkbox"
+            label={item.label}
+            name={item.key}
+            checked={item.checked}
+            onchange={handleCheckboxChange}
+          ></lightning-input>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
