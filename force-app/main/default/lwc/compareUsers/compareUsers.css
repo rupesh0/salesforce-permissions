@@ -1,0 +1,50 @@
+.vs-badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #0070d2, #014486);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 112, 210, 0.3);
+}
+
+.user-card {
+  border-radius: 6px;
+  background-color: #f3f3f3;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  max-height: 240px;
+  overflow-y: auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-item {
+  cursor: pointer;
+}
+
+.user-item:hover {
+  background-color: #f3f5f9;
+}
+
+.side-container {
+  border: 1px solid #dddbda;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.empty-side {
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

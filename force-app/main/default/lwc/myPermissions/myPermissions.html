@@ -6,13 +6,30 @@
       size="medium"
       variant="base"
     ></lightning-spinner>
-    <article class="slds-card">
-      <c-permissions lwc:if={filters} filters={filters}></c-permissions>
+
+    <div lwc:if={error}>
       <c-illustration
-        lwc:if={error}
         title={labels.permissions_label_error_failed_to_fatch_current_user_details}
         sub-title={error}
       ></c-illustration>
-    </article>
+    </div>
+
+    <div lwc:else class="slds-grid slds-grid_vertical">
+      <c-toolbar
+        title="My Permissions"
+        filter-values={currentFilters}
+        onsearch={handleSearch}
+        onfilterchange={handleFilterChange}
+        onapply={handleApply}
+        onclear={handleClear}
+        onreset={handleReset}
+      ></c-toolbar>
+
+      <c-all-permissions
+        profile-ids={appliedProfileIds}
+        permission-set-ids={appliedPermissionSetIds}
+        search-term={searchTerm}
+      ></c-all-permissions>
+    </div>
   </div>
 </template>

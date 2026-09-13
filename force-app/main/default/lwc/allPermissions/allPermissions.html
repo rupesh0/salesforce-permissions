@@ -1,0 +1,166 @@
+<template>
+  <div class="slds-m-top_medium">
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Object & Field Permissions
+      </h2>
+      <c-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        System Permissions
+      </h2>
+      <c-system-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-system-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        App Permissions
+      </h2>
+      <c-app-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-app-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Apex Class Access
+      </h2>
+      <c-apex-class-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-apex-class-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Visualforce Page Access
+      </h2>
+      <c-vf-page-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-vf-page-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Custom Setting Definitions
+      </h2>
+      <c-custom-settings
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-custom-settings>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Custom Metadata Types
+      </h2>
+      <c-custom-metadata-types
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-custom-metadata-types>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">Flow Access</h2>
+      <c-flow-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-flow-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Named Credential Access
+      </h2>
+      <c-named-credentials
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-named-credentials>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Organization-Wide Email Address Access
+      </h2>
+      <c-org-wide-email-address-access
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-org-wide-email-address-access>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Standard Invocable Action Type Access
+      </h2>
+      <c-standard-invocable-action-access
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-standard-invocable-action-access>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Service Providers
+      </h2>
+      <c-service-providers
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-service-providers>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Assigned Apps
+      </h2>
+      <c-assigned-app-permissions
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-assigned-app-permissions>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        Assigned Connected Apps
+      </h2>
+      <c-assigned-connected-app
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-assigned-connected-app>
+    </div>
+
+    <div class="slds-card slds-m-bottom_medium slds-p-around_medium">
+      <h2 class="slds-text-heading_medium slds-m-bottom_small">
+        External Data Sources
+      </h2>
+      <c-external-data-sources
+        profile-ids={profileIds}
+        permission-set-ids={permissionSetIds}
+        search-term={searchTerm}
+      ></c-external-data-sources>
+    </div>
+  </div>
+</template>

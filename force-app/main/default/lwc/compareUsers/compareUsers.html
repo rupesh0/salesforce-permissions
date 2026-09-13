@@ -1,0 +1,272 @@
+<template>
+  <div class="slds-card slds-m-around_medium">
+    <!-- Header: User Selection -->
+    <div class="slds-p-around_medium slds-border_bottom">
+      <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+        <!-- User 1 Selector -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+          <label class="slds-form-element__label slds-text-title_bold"
+            >User 1 (Left Side)</label
+          >
+          <template lwc:if={user1Selected}>
+            <div
+              class="user-card slds-box slds-box_x-small slds-grid slds-grid_vertical-align-center"
+            >
+              <lightning-icon
+                icon-name="standard:user"
+                size="small"
+                class="slds-m-right_small"
+              ></lightning-icon>
+              <div class="slds-col slds-truncate">
+                <div class="slds-text-heading_small slds-truncate">
+                  {user1Selected.userName}
+                </div>
+                <div class="slds-m-top_xx-small">
+                  <span class="slds-badge slds-theme_info slds-m-right_xx-small"
+                    >{user1Selected.profileName}</span
+                  >
+                  <span class="slds-badge"
+                    >{user1Selected.permissionSetCount} Permission Sets</span
+                  >
+                </div>
+              </div>
+              <lightning-button-icon
+                icon-name="utility:close"
+                variant="bare"
+                alternative-text="Change User"
+                title="Change User"
+                onclick={handleUser1Clear}
+              ></lightning-button-icon>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="slds-is-relative">
+              <lightning-input
+                variant="label-hidden"
+                type="search"
+                placeholder="Search user by name or username..."
+                value={user1SearchTerm}
+                onfocus={handleUser1Focus}
+                onblur={handleUser1Blur}
+                onchange={handleUser1SearchInput}
+                is-loading={isUser1Loading}
+              ></lightning-input>
+              <template lwc:if={showUser1Dropdown}>
+                <div
+                  class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid user-dropdown"
+                >
+                  <ul
+                    class="slds-listbox slds-listbox_vertical"
+                    role="presentation"
+                  >
+                    <template for:each={user1Options} for:item="opt">
+                      <li
+                        key={opt.id}
+                        role="presentation"
+                        class="slds-listbox__item user-item"
+                        data-id={opt.id}
+                        onmousedown={handleUser1Select}
+                      >
+                        <div
+                          class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                        >
+                          <span
+                            class="slds-media__figure slds-listbox__option-icon"
+                          >
+                            <lightning-icon
+                              icon-name="standard:user"
+                              size="x-small"
+                            ></lightning-icon>
+                          </span>
+                          <span class="slds-media__body">
+                            <span
+                              class="slds-listbox__option-text slds-listbox__option-text_entity"
+                              >{opt.name}</span
+                            >
+                            <span
+                              class="slds-listbox__option-meta slds-listbox__option-meta_entity"
+                              >{opt.profileName} &bull; {opt.username}</span
+                            >
+                          </span>
+                        </div>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+
+        <!-- VS Divider Badge -->
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-text-align_center slds-p-vertical_small"
+        >
+          <span class="vs-badge">VS</span>
+        </div>
+
+        <!-- User 2 Selector -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+          <label class="slds-form-element__label slds-text-title_bold"
+            >User 2 (Right Side)</label
+          >
+          <template lwc:if={user2Selected}>
+            <div
+              class="user-card slds-box slds-box_x-small slds-grid slds-grid_vertical-align-center"
+            >
+              <lightning-icon
+                icon-name="standard:user"
+                size="small"
+                class="slds-m-right_small"
+              ></lightning-icon>
+              <div class="slds-col slds-truncate">
+                <div class="slds-text-heading_small slds-truncate">
+                  {user2Selected.userName}
+                </div>
+                <div class="slds-m-top_xx-small">
+                  <span class="slds-badge slds-theme_info slds-m-right_xx-small"
+                    >{user2Selected.profileName}</span
+                  >
+                  <span class="slds-badge"
+                    >{user2Selected.permissionSetCount} Permission Sets</span
+                  >
+                </div>
+              </div>
+              <lightning-button-icon
+                icon-name="utility:close"
+                variant="bare"
+                alternative-text="Change User"
+                title="Change User"
+                onclick={handleUser2Clear}
+              ></lightning-button-icon>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="slds-is-relative">
+              <lightning-input
+                variant="label-hidden"
+                type="search"
+                placeholder="Search user by name or username..."
+                value={user2SearchTerm}
+                onfocus={handleUser2Focus}
+                onblur={handleUser2Blur}
+                onchange={handleUser2SearchInput}
+                is-loading={isUser2Loading}
+              ></lightning-input>
+              <template lwc:if={showUser2Dropdown}>
+                <div
+                  class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid user-dropdown"
+                >
+                  <ul
+                    class="slds-listbox slds-listbox_vertical"
+                    role="presentation"
+                  >
+                    <template for:each={user2Options} for:item="opt">
+                      <li
+                        key={opt.id}
+                        role="presentation"
+                        class="slds-listbox__item user-item"
+                        data-id={opt.id}
+                        onmousedown={handleUser2Select}
+                      >
+                        <div
+                          class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                        >
+                          <span
+                            class="slds-media__figure slds-listbox__option-icon"
+                          >
+                            <lightning-icon
+                              icon-name="standard:user"
+                              size="x-small"
+                            ></lightning-icon>
+                          </span>
+                          <span class="slds-media__body">
+                            <span
+                              class="slds-listbox__option-text slds-listbox__option-text_entity"
+                              >{opt.name}</span
+                            >
+                            <span
+                              class="slds-listbox__option-meta slds-listbox__option-meta_entity"
+                              >{opt.profileName} &bull; {opt.username}</span
+                            >
+                          </span>
+                        </div>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side-by-Side Permissions (Left / Right) -->
+    <div class="slds-p-around_medium">
+      <div class="slds-grid slds-gutters slds-wrap">
+        <!-- Left Side: User 1 -->
+        <div
+          class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_medium"
+        >
+          <template lwc:if={user1AppliedFilters}>
+            <c-toolbar
+              title={user1Title}
+              filter-values={user1CurrentFilters}
+              onsearch={handleUser1Search}
+              onfilterchange={handleUser1FilterChange}
+              onapply={handleUser1Apply}
+              onclear={handleUser1ClearFilters}
+              onreset={handleUser1ResetFilters}
+            ></c-toolbar>
+
+            <c-all-permissions
+              profile-ids={user1AppliedProfileIds}
+              permission-set-ids={user1AppliedPermissionSetIds}
+              search-term={user1SearchTerm}
+            ></c-all-permissions>
+          </template>
+          <template lwc:else>
+            <div class="slds-card slds-p-around_large slds-text-align_center">
+              <c-illustration
+                title="User 1 Not Selected"
+                sub-title="Select a user above to view their permissions on the left side."
+              ></c-illustration>
+            </div>
+          </template>
+        </div>
+
+        <!-- Right Side: User 2 -->
+        <div
+          class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-m-bottom_medium"
+        >
+          <template lwc:if={user2AppliedFilters}>
+            <c-toolbar
+              title={user2Title}
+              filter-values={user2CurrentFilters}
+              onsearch={handleUser2Search}
+              onfilterchange={handleUser2FilterChange}
+              onapply={handleUser2Apply}
+              onclear={handleUser2ClearFilters}
+              onreset={handleUser2ResetFilters}
+            ></c-toolbar>
+
+            <c-all-permissions
+              profile-ids={user2AppliedProfileIds}
+              permission-set-ids={user2AppliedPermissionSetIds}
+              search-term={user2SearchTerm}
+            ></c-all-permissions>
+          </template>
+          <template lwc:else>
+            <div class="slds-card slds-p-around_large slds-text-align_center">
+              <c-illustration
+                title="User 2 Not Selected"
+                sub-title="Select a user above to view their permissions on the right side."
+              ></c-illustration>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
