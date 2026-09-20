@@ -229,3 +229,20 @@
 .reason-table tr:last-child td {
   border-bottom: none;
 }
+
+.record-link {
+  color: #0176d3;
+  text-decoration: none;
+}
+.record-link:hover {
+  text-decoration: underline;
+}
+
+.user-header-link {
+  color: #0f172a;
+  text-decoration: none;
+}
+.user-header-link:hover {
+  color: #0176d3;
+  text-decoration: underline;
+}

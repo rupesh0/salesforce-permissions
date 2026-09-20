@@ -205,4 +205,77 @@ private class SecurityAdvisorControllerTest {
     System.assertEquals('Admin PS', ra.permissionSetLabel);
     Test.stopTest();
   }
+
+  @IsTest
+  static void testRemediationMethods() {
+    // 1. Query the inactive user assignment created in testSetup
+    List<PermissionSetAssignment> inactivePSAs = [
+      SELECT Id
+      FROM PermissionSetAssignment
+      WHERE Assignee.IsActive = FALSE AND PermissionSet.IsOwnedByProfile = FALSE
+      LIMIT 1
+    ];
+    System.assert(
+      !inactivePSAs.isEmpty(),
+      'Should find inactive user assignment'
+    );
+
+    Test.startTest();
+    // Test remediateInactiveUserAssignments
+    SecurityAdvisorController.RemediationResultDTO remInactive = SecurityAdvisorController.remediateInactiveUserAssignments(
+      new List<Id>{ inactivePSAs[0].Id }
+    );
+    System.assert(
+      remInactive.isSuccess,
+      'Remediation of inactive user should succeed'
+    );
+
+    // Test error handling for blank assignment IDs
+    try {
+      SecurityAdvisorController.remediateInactiveUserAssignments(
+        new List<Id>()
+      );
+      System.assert(false, 'Should throw exception on empty list');
+    } catch (AuraHandledException e) {
+      System.assert(true);
+    }
+
+    // 2. Query redundant assignment
+    List<PermissionSetAssignment> adminPSAs = [
+      SELECT Id
+      FROM PermissionSetAssignment
+      WHERE
+        Assignee.Profile.Name = 'System Administrator'
+        AND PermissionSet.Label = 'Test Redundant PS'
+      LIMIT 1
+    ];
+    if (!adminPSAs.isEmpty()) {
+      SecurityAdvisorController.RemediationResultDTO remRedun = SecurityAdvisorController.remediateRedundantAssignment(
+        adminPSAs[0].Id
+      );
+      System.assert(
+        remRedun.isSuccess,
+        'Remediation of redundant assignment should succeed'
+      );
+    }
+
+    // Test error handling for null assignment ID
+    try {
+      SecurityAdvisorController.remediateRedundantAssignment(null);
+      System.assert(false, 'Should throw exception on null ID');
+    } catch (AuraHandledException e) {
+      System.assert(true);
+    }
+
+    // Test remediation for already deleted ID
+    SecurityAdvisorController.RemediationResultDTO remNonExistent = SecurityAdvisorController.remediateRedundantAssignment(
+      inactivePSAs[0].Id
+    );
+    System.assertEquals(
+      false,
+      remNonExistent.isSuccess,
+      'Should return false for non-existent ID'
+    );
+    Test.stopTest();
+  }
 }

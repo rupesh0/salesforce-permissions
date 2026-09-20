@@ -386,9 +386,11 @@
     <template lwc:if={hasResults}>
       <div class="slds-p-around_medium slds-border_top">
         <div
-          class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small"
+          class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small slds-wrap"
         >
-          <div class="slds-grid slds-grid_vertical-align-center">
+          <div
+            class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small"
+          >
             <lightning-icon
               icon-name="utility:matrix"
               size="small"
@@ -398,20 +400,59 @@
               Access Matrix Results
             </h2>
             <span class="slds-badge slds-m-left_small slds-theme_success">
-              {matrixRows.length} Records evaluated
+              {totalFilteredCount} of {matrixRows.length} Records
             </span>
           </div>
-          <div class="slds-grid slds-grid_vertical-align-center">
+
+          <!-- Pagination & In-Table Search Controls -->
+          <div
+            class="slds-grid slds-grid_vertical-align-center slds-wrap"
+            style="gap: 0.5rem"
+          >
+            <div style="width: 220px">
+              <lightning-input
+                type="search"
+                variant="label-hidden"
+                placeholder="Filter evaluated records..."
+                value={tableSearchTerm}
+                onchange={handleTableSearchChange}
+              ></lightning-input>
+            </div>
             <div
-              class="slds-text-body_extra-small slds-text-color_weak slds-m-right_small"
+              class="slds-grid slds-grid_vertical-align-center"
+              style="gap: 0.35rem"
             >
-              Click the
-              <lightning-icon
-                icon-name="utility:info"
-                size="xx-small"
-                class="slds-m-horizontal_xx-small"
-              ></lightning-icon>
-              icon in any row to see in-depth sharing analysis.
+              <span class="slds-text-body_small slds-text-color_weak"
+                >Show:</span
+              >
+              <lightning-combobox
+                variant="label-hidden"
+                value={pageSize}
+                options={pageSizeOptions}
+                onchange={handlePageSizeChange}
+                style="width: 80px"
+              ></lightning-combobox>
+              <lightning-button-icon
+                icon-name="utility:chevronleft"
+                variant="border-filled"
+                size="small"
+                alternative-text="Previous Page"
+                disabled={isFirstPage}
+                onclick={handlePrevPage}
+              ></lightning-button-icon>
+              <span
+                class="slds-text-body_small slds-text-color_weak slds-p-horizontal_xx-small"
+              >
+                {currentPage} / {totalPages}
+              </span>
+              <lightning-button-icon
+                icon-name="utility:chevronright"
+                variant="border-filled"
+                size="small"
+                alternative-text="Next Page"
+                disabled={isLastPage}
+                onclick={handleNextPage}
+              ></lightning-button-icon>
             </div>
             <lightning-button
               label="Export CSV"
@@ -431,9 +472,9 @@
                 <th
                   class="record-col-header"
                   rowspan="2"
-                  style="width: 50px; text-align: center"
+                  style="width: 70px; text-align: center"
                 >
-                  Info
+                  Actions
                 </th>
                 <th
                   class="record-col-header"
@@ -466,8 +507,16 @@
                       border-left: 2px solid #94a3b8;
                     "
                   >
-                    <div class="slds-truncate" title={u.userName}>
-                      {u.userName}
+                    <div class="slds-truncate">
+                      <a
+                        href={u.setupUserUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="user-header-link"
+                        title="Open User Setup in Salesforce"
+                      >
+                        {u.userName}
+                      </a>
                     </div>
                     <div
                       class="slds-badge slds-m-top_xx-small"
@@ -508,10 +557,10 @@
               </tr>
             </thead>
             <tbody>
-              <template for:each={matrixRows} for:item="row">
+              <template for:each={paginatedRows} for:item="row">
                 <tr key={row.recordId}>
-                  <!-- Info / Details Action Button -->
-                  <td style="text-align: center">
+                  <!-- Actions: Sharing Details & Quick Grant Share -->
+                  <td style="text-align: center; white-space: nowrap">
                     <lightning-button-icon
                       icon-name="utility:info"
                       variant="bare"
@@ -520,12 +569,28 @@
                       data-record-id={row.recordId}
                       onclick={handleOpenDetails}
                     ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:share"
+                      variant="bare"
+                      alternative-text="Grant Manual Share"
+                      title="Grant Manual Share to User"
+                      class="slds-m-left_xx-small"
+                      data-record-id={row.recordId}
+                      data-record-name={row.recordName}
+                      onclick={handleOpenGrantFromRow}
+                    ></lightning-button-icon>
                   </td>
-                  <!-- Record Name -->
+                  <!-- Record Name with Deep Link -->
                   <td class="font-weight-600">
-                    <span class="slds-truncate" title={row.recordName}
-                      >{row.recordName}</span
+                    <a
+                      href={row.recordUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      class="record-link slds-truncate"
+                      title={row.recordName}
                     >
+                      {row.recordName}
+                    </a>
                   </td>
                   <!-- sObject -->
                   <td>
@@ -739,6 +804,18 @@
                     <span class={userExp.badgeClass}>
                       Overall: {userExp.overallAccess}
                     </span>
+                    <lightning-button
+                      label="Grant Share"
+                      icon-name="utility:share"
+                      variant="neutral"
+                      size="small"
+                      class="slds-m-left_small"
+                      data-user-id={userExp.userId}
+                      data-user-name={userExp.userName}
+                      data-record-id={modalData.recordId}
+                      data-record-name={modalData.recordName}
+                      onclick={handleOpenGrantFromModal}
+                    ></lightning-button>
                   </div>
                 </div>
 
@@ -748,7 +825,8 @@
                     <tr>
                       <th style="width: 25%">Access Source</th>
                       <th style="width: 20%">Access Level</th>
-                      <th style="width: 55%">Explanation / Details</th>
+                      <th style="width: 43%">Explanation / Details</th>
+                      <th style="width: 12%; text-align: center">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -765,6 +843,26 @@
                         <td class="font-weight-600">{reason.accessLevel}</td>
                         <td class="slds-text-color_default">
                           {reason.details}
+                        </td>
+                        <td style="text-align: center">
+                          <template lwc:if={reason.isManualShare}>
+                            <lightning-button
+                              label="Revoke"
+                              icon-name="utility:delete"
+                              variant="destructive"
+                              size="x-small"
+                              data-user-id={userExp.userId}
+                              data-record-id={modalData.recordId}
+                              data-sobject={modalData.sObjectName}
+                              onclick={handleRevokeShare}
+                            ></lightning-button>
+                          </template>
+                          <template lwc:else>
+                            <span
+                              class="slds-text-body_extra-small slds-text-color_weak"
+                              >-</span
+                            >
+                          </template>
                         </td>
                       </tr>
                     </template>
@@ -786,5 +884,105 @@
       </div>
     </section>
     <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+
+  <!-- Grant Manual Share Modal Dialog -->
+  <template lwc:if={isGrantModalOpen}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      class="slds-modal slds-fade-in-open slds-modal_small"
+      style="z-index: 9999"
+    >
+      <div class="slds-modal__container">
+        <header
+          class="slds-modal__header modal-header-banner slds-grid slds-grid_align-spread slds-grid_vertical-align-center"
+        >
+          <div>
+            <h2
+              class="slds-text-heading_medium"
+              style="color: #ffffff; font-weight: 700"
+            >
+              Grant Manual Share
+            </h2>
+            <p
+              class="slds-m-top_xx-small"
+              style="color: #cbd5e1; font-size: 0.82rem"
+            >
+              Explicitly grant Read or Read/Write access for this record to a
+              specific user.
+            </p>
+          </div>
+          <lightning-button-icon
+            icon-name="utility:close"
+            variant="bare-inverse"
+            size="large"
+            alternative-text="Close"
+            onclick={handleCloseGrantModal}
+          ></lightning-button-icon>
+        </header>
+
+        <div class="slds-modal__content slds-p-around_medium">
+          <div class="slds-form slds-form_stacked">
+            <div class="slds-form-element slds-m-bottom_small">
+              <label class="slds-form-element__label font-weight-700"
+                >Record</label
+              >
+              <div class="slds-form-element__control">
+                <div
+                  class="slds-box slds-box_x-small"
+                  style="background: #f8fafc"
+                >
+                  <strong>{grantRecordName}</strong>
+                  <span class="slds-m-left_small mono-font slds-text-color_weak"
+                    >{grantRecordId}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="slds-form-element slds-m-bottom_small">
+              <lightning-combobox
+                name="grantUserPicker"
+                label="Target User"
+                value={grantUserId}
+                placeholder="Select user to grant access..."
+                options={grantUserOptions}
+                onchange={handleGrantUserChange}
+                required
+              ></lightning-combobox>
+            </div>
+
+            <div class="slds-form-element slds-m-bottom_small">
+              <lightning-combobox
+                name="grantAccessLevelPicker"
+                label="Access Level"
+                value={grantAccessLevel}
+                options={grantAccessLevelOptions}
+                onchange={handleGrantAccessLevelChange}
+                required
+              ></lightning-combobox>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+          <lightning-button
+            label="Cancel"
+            variant="neutral"
+            onclick={handleCloseGrantModal}
+          ></lightning-button>
+          <lightning-button
+            label="Grant Share"
+            icon-name="utility:check"
+            variant="brand"
+            disabled={isGrantSubmitDisabled}
+            onclick={handleExecuteGrantShare}
+          ></lightning-button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" style="z-index: 9998"></div>
   </template>
 </template>

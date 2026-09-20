@@ -416,6 +416,7 @@ public with sharing class SecurityAdvisorController {
     // Identify System Administrator profile users assigned custom permission sets that grant admin permissions
     List<PermissionSetAssignment> psas = [
       SELECT
+        Id,
         AssigneeId,
         Assignee.Name,
         Assignee.Profile.Name,
@@ -448,6 +449,7 @@ public with sharing class SecurityAdvisorController {
         perms.add('Customize Application');
 
       RedundantAssignmentDTO dto = new RedundantAssignmentDTO();
+      dto.assignmentId = psa.Id;
       dto.userId = psa.AssigneeId;
       dto.userName = psa.Assignee.Name;
       dto.profileName = psa.Assignee.Profile != null
@@ -460,6 +462,71 @@ public with sharing class SecurityAdvisorController {
     }
 
     return redundantList;
+  }
+
+  // --- In-App Remediation Actions ---
+
+  @AuraEnabled
+  public static RemediationResultDTO remediateInactiveUserAssignments(
+    List<Id> assignmentIds
+  ) {
+    if (assignmentIds == null || assignmentIds.isEmpty()) {
+      throw new AuraHandledException(
+        'No assignment IDs provided for remediation.'
+      );
+    }
+    try {
+      List<PermissionSetAssignment> toDelete = [
+        SELECT Id
+        FROM PermissionSetAssignment
+        WHERE Id IN :assignmentIds
+      ];
+      delete toDelete;
+      return new RemediationResultDTO(
+        true,
+        'Successfully removed ' +
+          toDelete.size() +
+          ' inactive user assignment(s).'
+      );
+    } catch (Exception e) {
+      throw new AuraHandledException(
+        'Failed to remove assignments: ' + e.getMessage()
+      );
+    }
+  }
+
+  @AuraEnabled
+  public static RemediationResultDTO remediateRedundantAssignment(
+    Id assignmentId
+  ) {
+    if (assignmentId == null) {
+      throw new AuraHandledException(
+        'No assignment ID provided for remediation.'
+      );
+    }
+    try {
+      List<PermissionSetAssignment> toDelete = [
+        SELECT Id
+        FROM PermissionSetAssignment
+        WHERE Id = :assignmentId
+        LIMIT 1
+      ];
+      if (toDelete.isEmpty()) {
+        return new RemediationResultDTO(
+          false,
+          'Assignment not found or already removed.'
+        );
+      }
+      delete toDelete[0];
+      return new RemediationResultDTO(
+        true,
+        'Successfully removed redundant permission set assignment.'
+      );
+    } catch (Exception e) {
+      throw new AuraHandledException(
+        'Failed to remove assignment: ' + e.getMessage()
+      );
+    }
   }
 
   // --- Helper Classes & DTOs ---
@@ -585,6 +652,8 @@ public with sharing class SecurityAdvisorController {
 
   public class RedundantAssignmentDTO {
     @AuraEnabled
+    public Id assignmentId;
+    @AuraEnabled
     public Id userId;
     @AuraEnabled
     public String userName;
@@ -596,5 +665,17 @@ public with sharing class SecurityAdvisorController {
     public String redundantPermission;
     @AuraEnabled
     public String reason;
+  }
+
+  public class RemediationResultDTO {
+    @AuraEnabled
+    public Boolean isSuccess;
+    @AuraEnabled
+    public String message;
+
+    public RemediationResultDTO(Boolean isSuccess, String message) {
+      this.isSuccess = isSuccess;
+      this.message = message;
+    }
   }
 }

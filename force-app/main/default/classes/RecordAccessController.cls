@@ -2,6 +2,11 @@ public without sharing class RecordAccessController {
   @AuraEnabled(cacheable=true)
   public static List<SObjectOption> getSearchableSObjects() {
     try {
+      Object cached = DescribeCacheService.get('SearchableSObjects');
+      if (cached != null) {
+        return (List<SObjectOption>) cached;
+      }
+
       List<SObjectOption> options = new List<SObjectOption>();
       Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
 
@@ -25,6 +30,7 @@ public without sharing class RecordAccessController {
       }
 
       options.sort();
+      DescribeCacheService.put('SearchableSObjects', options, 3600);
       return options;
     } catch (Exception e) {
       throw new AuraHandledException(e.getMessage());
@@ -171,6 +177,8 @@ public without sharing class RecordAccessController {
         uh.userId = u.Id;
         uh.userName = u.Name;
         uh.profileName = u.Profile != null ? u.Profile.Name : '';
+        uh.setupUserUrl =
+          '/lightning/setup/ManageUsers/page?address=%2F' + u.Id;
         result.users.add(uh);
       }
 
@@ -190,6 +198,7 @@ public without sharing class RecordAccessController {
         row.recordName = String.valueOf(rId);
         row.sObjectName = sObjName;
         row.sObjectLabel = rId.getSObjectType().getDescribe().getLabel();
+        row.recordUrl = '/lightning/r/' + sObjName + '/' + rId + '/view';
         row.userAccess = new Map<String, AccessDTO>();
         rowMap.put(rId, row);
       }
@@ -381,7 +390,9 @@ public without sharing class RecordAccessController {
           permSetIdsWithViewAll.add(op.ParentId);
         }
       }
-      if (!permSetIdsWithModifyAll.isEmpty() || !permSetIdsWithViewAll.isEmpty()) {
+      if (
+        !permSetIdsWithModifyAll.isEmpty() || !permSetIdsWithViewAll.isEmpty()
+      ) {
         List<PermissionSetAssignment> psAssignments = [
           SELECT AssigneeId, PermissionSetId
           FROM PermissionSetAssignment
@@ -458,9 +469,7 @@ public without sharing class RecordAccessController {
         List<GroupMember> gms = [
           SELECT GroupId, UserOrGroupId
           FROM GroupMember
-          WHERE
-            GroupId IN :groupIdsInShares
-            AND UserOrGroupId IN :userIds
+          WHERE GroupId IN :groupIdsInShares AND UserOrGroupId IN :userIds
         ];
         for (GroupMember gm : gms) {
           if (userToMemberGroups.containsKey(gm.UserOrGroupId)) {
@@ -475,9 +484,7 @@ public without sharing class RecordAccessController {
         for (User u : userRoleMap.values()) {
           if (u.UserRoleId != null) {
             for (Group grp : groupMap.values()) {
-              if (
-                grp.Type == 'Role' && grp.RelatedId == u.UserRoleId
-              ) {
+              if (grp.Type == 'Role' && grp.RelatedId == u.UserRoleId) {
                 userToMemberGroups.get(u.Id).add(grp.Id);
               }
             }
@@ -517,6 +524,14 @@ public without sharing class RecordAccessController {
         userDetail.userId = u.Id;
         userDetail.userName = u.Name;
         userDetail.profileName = u.Profile != null ? u.Profile.Name : '';
+        userDetail.setupUserUrl =
+          '/lightning/setup/ManageUsers/page?address=%2F' + u.Id;
+        userDetail.recordUrl =
+          '/lightning/r/' +
+          sObjName +
+          '/' +
+          recordId +
+          '/view';
         userDetail.reasons = new List<SharingReasonDTO>();
 
         UserRecordAccess ura = uraMap.get(u.Id);
@@ -619,9 +634,16 @@ public without sharing class RecordAccessController {
           if (ugId == u.Id) {
             String category = formatRowCauseCategory(rowCause);
             String explanation = formatRowCauseDetail(rowCause, accLevel, null);
-            userDetail.reasons.add(
-              new SharingReasonDTO(category, accLevel, explanation)
+            SharingReasonDTO rDto = new SharingReasonDTO(
+              category,
+              accLevel,
+              explanation
             );
+            if (rowCause == 'Manual') {
+              rDto.isManualShare = true;
+              rDto.shareRecordId = sh.Id;
+            }
+            userDetail.reasons.add(rDto);
           }
           // Shared via Group / Role
           else if (
@@ -662,6 +684,176 @@ public without sharing class RecordAccessController {
       return result;
     } catch (Exception e) {
       throw new AuraHandledException(e.getMessage());
+    }
+  }
+
+  // --- In-App Remediation Actions ---
+
+  @AuraEnabled
+  public static RemediationResultDTO grantManualShare(
+    String sObjectName,
+    Id recordId,
+    Id userId,
+    String accessLevel
+  ) {
+    if (
+      String.isBlank(sObjectName) ||
+      recordId == null ||
+      userId == null ||
+      String.isBlank(accessLevel)
+    ) {
+      throw new AuraHandledException(
+        'Missing required parameters for manual share.'
+      );
+    }
+    try {
+      // 1. Inspect object's OWD
+      String internalOwd = 'Private';
+      try {
+        List<SObject> eds = Database.query(
+          'SELECT QualifiedApiName, InternalSharingModel FROM EntityDefinition WHERE QualifiedApiName = :sObjectName LIMIT 1'
+        );
+        if (!eds.isEmpty()) {
+          internalOwd = (String) eds[0].get('InternalSharingModel');
+        }
+      } catch (Exception ex) {
+        internalOwd = 'Private';
+      }
+
+      if (internalOwd == 'ReadWrite' || internalOwd == 'Full') {
+        return new RemediationResultDTO(
+          false,
+          'Manual sharing is not applicable because this object has an Org-Wide Default of Public Read/Write.',
+          null
+        );
+      }
+      if (internalOwd == 'ControlledByParent') {
+        return new RemediationResultDTO(
+          false,
+          'This object is Controlled by Parent (Master-Detail). Sharing access must be granted directly on the parent record.',
+          null
+        );
+      }
+
+      String shareTableName = getShareTableName(sObjectName);
+      Schema.SObjectType sot = Schema.getGlobalDescribe()
+        .get(shareTableName.toLowerCase());
+      if (sot == null) {
+        return new RemediationResultDTO(
+          false,
+          'Sharing table (' +
+            shareTableName +
+            ') is not supported or accessible for object ' +
+            sObjectName +
+            '.',
+          null
+        );
+      }
+
+      String parentField = getShareParentField(sObjectName);
+      String accessField = getShareAccessLevelField(sObjectName);
+
+      // Check if an explicit manual share already exists
+      String checkQuery =
+        'SELECT Id, ' +
+        String.escapeSingleQuotes(accessField) +
+        ' FROM ' +
+        String.escapeSingleQuotes(shareTableName) +
+        ' WHERE ' +
+        String.escapeSingleQuotes(parentField) +
+        ' = :recordId AND UserOrGroupId = :userId AND RowCause = \'Manual\' LIMIT 1';
+      List<SObject> existing = Database.query(checkQuery);
+
+      SObject shareObj;
+      if (!existing.isEmpty()) {
+        shareObj = existing[0];
+        shareObj.put(accessField, accessLevel);
+        update shareObj;
+        return new RemediationResultDTO(
+          true,
+          'Manual share updated successfully to ' + accessLevel + ' access.',
+          String.valueOf(shareObj.Id)
+        );
+      } else {
+        shareObj = sot.newSObject();
+        shareObj.put(parentField, recordId);
+        shareObj.put('UserOrGroupId', userId);
+        shareObj.put(accessField, accessLevel);
+        shareObj.put('RowCause', 'Manual');
+
+        if (sObjectName == 'Account') {
+          shareObj.put('OpportunityAccessLevel', 'None');
+          shareObj.put('CaseAccessLevel', 'None');
+        }
+
+        insert shareObj;
+        return new RemediationResultDTO(
+          true,
+          'Manual share granted successfully with ' + accessLevel + ' access.',
+          String.valueOf(shareObj.Id)
+        );
+      }
+    } catch (Exception e) {
+      throw new AuraHandledException(
+        'Failed to grant manual share: ' + e.getMessage()
+      );
+    }
+  }
+
+  @AuraEnabled
+  public static RemediationResultDTO revokeManualShare(
+    String sObjectName,
+    Id recordId,
+    Id userId
+  ) {
+    if (String.isBlank(sObjectName) || recordId == null || userId == null) {
+      throw new AuraHandledException(
+        'Missing required parameters to revoke share.'
+      );
+    }
+    try {
+      String shareTableName = getShareTableName(sObjectName);
+      Schema.SObjectType sot = Schema.getGlobalDescribe()
+        .get(shareTableName.toLowerCase());
+      if (sot == null) {
+        return new RemediationResultDTO(
+          false,
+          'Sharing table (' +
+            shareTableName +
+            ') is not supported for object ' +
+            sObjectName +
+            '.',
+          null
+        );
+      }
+
+      String parentField = getShareParentField(sObjectName);
+      String checkQuery =
+        'SELECT Id FROM ' +
+        String.escapeSingleQuotes(shareTableName) +
+        ' WHERE ' +
+        String.escapeSingleQuotes(parentField) +
+        ' = :recordId AND UserOrGroupId = :userId AND RowCause = \'Manual\' LIMIT 1';
+      List<SObject> existing = Database.query(checkQuery);
+
+      if (existing.isEmpty()) {
+        return new RemediationResultDTO(
+          false,
+          'No explicit manual share found for this user on this record.',
+          null
+        );
+      }
+
+      delete existing[0];
+      return new RemediationResultDTO(
+        true,
+        'Manual share revoked successfully.',
+        String.valueOf(existing[0].Id)
+      );
+    } catch (Exception e) {
+      throw new AuraHandledException(
+        'Failed to revoke manual share: ' + e.getMessage()
+      );
     }
   }
 
@@ -859,6 +1051,8 @@ public without sharing class RecordAccessController {
     public String userName;
     @AuraEnabled
     public String profileName;
+    @AuraEnabled
+    public String setupUserUrl;
   }
 
   public class RecordRowDTO {
@@ -870,6 +1064,8 @@ public without sharing class RecordAccessController {
     public String sObjectName;
     @AuraEnabled
     public String sObjectLabel;
+    @AuraEnabled
+    public String recordUrl;
     @AuraEnabled
     public Map<String, AccessDTO> userAccess;
   }
@@ -912,6 +1108,10 @@ public without sharing class RecordAccessController {
     @AuraEnabled
     public String overallAccess;
     @AuraEnabled
+    public String setupUserUrl;
+    @AuraEnabled
+    public String recordUrl;
+    @AuraEnabled
     public List<SharingReasonDTO> reasons;
   }
 
@@ -922,6 +1122,10 @@ public without sharing class RecordAccessController {
     public String accessLevel;
     @AuraEnabled
     public String details;
+    @AuraEnabled
+    public Boolean isManualShare;
+    @AuraEnabled
+    public Id shareRecordId;
 
     public SharingReasonDTO(
       String category,
@@ -931,6 +1135,26 @@ public without sharing class RecordAccessController {
       this.category = category;
       this.accessLevel = accessLevel;
       this.details = details;
+      this.isManualShare = false;
+    }
+  }
+
+  public class RemediationResultDTO {
+    @AuraEnabled
+    public Boolean isSuccess;
+    @AuraEnabled
+    public String message;
+    @AuraEnabled
+    public String recordId;
+
+    public RemediationResultDTO(
+      Boolean isSuccess,
+      String message,
+      String recordId
+    ) {
+      this.isSuccess = isSuccess;
+      this.message = message;
+      this.recordId = recordId;
     }
   }
 }

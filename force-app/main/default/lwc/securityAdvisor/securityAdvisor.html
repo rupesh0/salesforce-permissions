@@ -216,22 +216,37 @@
             Redundant Admin Assignments
             <span class="badge">{filteredRedundantAssignments.length}</span>
           </button>
+          <button
+            class={auditTabClass}
+            data-tab="AUDIT"
+            onclick={handleTabClick}
+          >
+            <lightning-icon
+              icon-name="utility:tracker"
+              size="xx-small"
+              class="slds-m-right_xx-small"
+            ></lightning-icon>
+            Setup Audit Trail (7 Days)
+            <span class="badge">{totalAuditCount}</span>
+          </button>
         </div>
 
-        <!-- Search Bar -->
-        <div
-          class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium"
-        >
-          <div class="search-input-wrapper">
-            <lightning-input
-              type="search"
-              variant="label-hidden"
-              placeholder="Search findings in this view..."
-              value={searchTerm}
-              onchange={handleSearchChange}
-            ></lightning-input>
+        <!-- Search Bar (for tabs 1-4) -->
+        <template lwc:if={showGeneralSearchBar}>
+          <div
+            class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium"
+          >
+            <div class="search-input-wrapper">
+              <lightning-input
+                type="search"
+                variant="label-hidden"
+                placeholder="Search findings in this view..."
+                value={searchTerm}
+                onchange={handleSearchChange}
+              ></lightning-input>
+            </div>
           </div>
-        </div>
+        </template>
 
         <!-- Tab 1: Critical Privileges Scanner Table -->
         <template lwc:if={isCriticalTab}>
@@ -388,14 +403,31 @@
         <!-- Tab 3: Inactive Users with Assignments Table -->
         <template lwc:if={isInactiveTab}>
           <template lwc:if={filteredInactiveAssignments.length}>
+            <div
+              class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small"
+            >
+              <span class="slds-text-body_small slds-text-color_weak">
+                Remove custom permission set assignments from deactivated
+                accounts to maintain security hygiene.
+              </span>
+              <lightning-button
+                label="Remediate All Inactive"
+                icon-name="utility:delete"
+                variant="destructive"
+                size="small"
+                onclick={handleRemediateAllInactive}
+                disabled={isRemediating}
+              ></lightning-button>
+            </div>
             <div class="slds-scrollable_x">
               <table class="custom-table">
                 <thead>
                   <tr>
-                    <th style="width: 25%">Inactive User</th>
-                    <th style="width: 20%">Username</th>
+                    <th style="width: 22%">Inactive User</th>
+                    <th style="width: 18%">Username</th>
                     <th style="width: 20%">Assigned Permission Set</th>
-                    <th style="width: 35%">Recommendation</th>
+                    <th style="width: 28%">Recommendation</th>
+                    <th style="width: 12%; text-align: center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -436,6 +468,17 @@
                           prevent credential misuse and cleanup audit logs.
                         </div>
                       </td>
+                      <td style="text-align: center">
+                        <lightning-button
+                          label="Remove"
+                          icon-name="utility:delete"
+                          variant="destructive-text"
+                          size="x-small"
+                          data-id={ia.assignmentId}
+                          onclick={handleRemediateSingleInactive}
+                          disabled={isRemediating}
+                        ></lightning-button>
+                      </td>
                     </tr>
                   </template>
                 </tbody>
@@ -469,12 +512,13 @@
               <table class="custom-table">
                 <thead>
                   <tr>
-                    <th style="width: 22%">Admin User</th>
-                    <th style="width: 18%">Profile</th>
-                    <th style="width: 25%">Assigned Permission Set</th>
-                    <th style="width: 35%">
+                    <th style="width: 20%">Admin User</th>
+                    <th style="width: 15%">Profile</th>
+                    <th style="width: 22%">Assigned Permission Set</th>
+                    <th style="width: 31%">
                       Redundant Capabilities & Advisory
                     </th>
+                    <th style="width: 12%; text-align: center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -482,7 +526,7 @@
                     for:each={filteredRedundantAssignments}
                     for:item="ra"
                   >
-                    <tr key={ra.userId}>
+                    <tr key={ra.assignmentId}>
                       <td>
                         <div class="slds-text-title_bold">{ra.userName}</div>
                       </td>
@@ -505,6 +549,17 @@
                         >
                           {ra.reason}
                         </div>
+                      </td>
+                      <td style="text-align: center">
+                        <lightning-button
+                          label="Remove"
+                          icon-name="utility:delete"
+                          variant="destructive-text"
+                          size="x-small"
+                          data-id={ra.assignmentId}
+                          onclick={handleRemediateSingleRedundant}
+                          disabled={isRemediating}
+                        ></lightning-button>
                       </td>
                     </tr>
                   </template>
@@ -529,6 +584,138 @@
                 admin permission sets.
               </p>
             </div>
+          </template>
+        </template>
+
+        <!-- Tab 5: Setup Audit Trail Inspector (7 Days) -->
+        <template lwc:if={isAuditTab}>
+          <div
+            class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_medium slds-wrap"
+            style="gap: 0.75rem"
+          >
+            <div
+              class="slds-grid slds-grid_vertical-align-center slds-wrap"
+              style="gap: 0.5rem"
+            >
+              <span
+                class="slds-text-body_small slds-text-color_weak font-weight-600"
+              >
+                Section:
+              </span>
+              <lightning-combobox
+                variant="label-hidden"
+                value={selectedAuditSection}
+                options={auditSectionOptions}
+                onchange={handleAuditSectionChange}
+                style="min-width: 180px"
+              ></lightning-combobox>
+              <div style="width: 240px">
+                <lightning-input
+                  type="search"
+                  variant="label-hidden"
+                  placeholder="Filter audit log..."
+                  value={auditSearchTerm}
+                  onchange={handleAuditSearchChange}
+                ></lightning-input>
+              </div>
+            </div>
+            <div>
+              <lightning-button
+                label="Refresh Logs"
+                icon-name="utility:refresh"
+                variant="neutral"
+                size="small"
+                onclick={handleRefreshAudit}
+                class="slds-m-right_x-small"
+              ></lightning-button>
+              <lightning-button
+                label="Export Audit CSV"
+                icon-name="utility:download"
+                variant="brand"
+                size="small"
+                onclick={handleExportAuditCsv}
+              ></lightning-button>
+            </div>
+          </div>
+
+          <template lwc:if={isAuditLoading}>
+            <div style="position: relative; height: 180px">
+              <lightning-spinner
+                alternative-text="Loading Audit Trail..."
+                size="medium"
+              ></lightning-spinner>
+            </div>
+          </template>
+
+          <template lwc:else>
+            <template lwc:if={filteredAuditTrails.length}>
+              <div class="slds-scrollable_x">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 18%">Action</th>
+                      <th style="width: 18%">Section</th>
+                      <th style="width: 36%">Description / Change Details</th>
+                      <th style="width: 14%">Date & Time</th>
+                      <th style="width: 14%">User</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={filteredAuditTrails} for:item="at">
+                      <tr key={at.id}>
+                        <td>
+                          <span
+                            class="slds-badge slds-theme_shade font-code"
+                            style="font-size: 0.75rem"
+                          >
+                            {at.action}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="slds-text-title_bold">{at.section}</span>
+                        </td>
+                        <td>
+                          <div class="slds-text-body_small">{at.display}</div>
+                        </td>
+                        <td class="slds-text-body_small slds-text-color_weak">
+                          {at.createdDateFormatted}
+                        </td>
+                        <td>
+                          <div class="slds-text-title_bold">
+                            {at.createdByName}
+                          </div>
+                          <template lwc:if={at.delegateUser}>
+                            <div
+                              class="slds-text-body_extra-small slds-text-color_weak"
+                            >
+                              via {at.delegateUser}
+                            </div>
+                          </template>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </template>
+            <template lwc:else>
+              <div class="empty-state">
+                <lightning-icon
+                  icon-name="utility:check"
+                  size="medium"
+                  variant="success"
+                ></lightning-icon>
+                <div
+                  class="slds-m-top_small slds-text-heading_small font-weight-700"
+                >
+                  No Audit Trail Entries Found
+                </div>
+                <p class="slds-text-body_small slds-text-color_weak">
+                  No configuration or security changes recorded in the past 7
+                  days matching this filter.
+                </p>
+              </div>
+            </template>
           </template>
         </template>
       </template>

@@ -1,13 +1,18 @@
 import { LightningElement, track } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import getSecurityHealthSummary from "@salesforce/apex/SecurityAdvisorController.getSecurityHealthSummary";
+import remediateInactiveUserAssignments from "@salesforce/apex/SecurityAdvisorController.remediateInactiveUserAssignments";
+import remediateRedundantAssignment from "@salesforce/apex/SecurityAdvisorController.remediateRedundantAssignment";
+import getRecentSecurityAuditTrails from "@salesforce/apex/SetupAuditTrailController.getRecentSecurityAuditTrails";
+import getAuditTrailSections from "@salesforce/apex/SetupAuditTrailController.getAuditTrailSections";
 import { exportToCsv } from "c/csvExportUtil";
+import { reduceErrors } from "c/utils";
 
 export default class SecurityAdvisor extends LightningElement {
   @track summary = null;
   isLoading = true;
 
-  // Active view tab: 'CRITICAL' | 'DORMANT' | 'INACTIVE' | 'REDUNDANT'
+  // Active view tab: 'CRITICAL' | 'DORMANT' | 'INACTIVE' | 'REDUNDANT' | 'AUDIT'
   activeTab = "CRITICAL";
   searchTerm = "";
 
@@ -15,6 +20,17 @@ export default class SecurityAdvisor extends LightningElement {
   isModalOpen = false;
   selectedFinding = null;
   modalSearchTerm = "";
+
+  // Remediation State
+  isRemediating = false;
+
+  // Audit Trail Tab State
+  @track auditTrails = [];
+  @track auditSections = [];
+  selectedAuditSection = "ALL";
+  auditSearchTerm = "";
+  isAuditLoading = false;
+  hasLoadedAudit = false;
 
   connectedCallback() {
     this.loadSecuritySummary();
@@ -38,6 +54,9 @@ export default class SecurityAdvisor extends LightningElement {
 
   handleRefresh() {
     this.loadSecuritySummary();
+    if (this.isAuditTab) {
+      this.loadAuditTrails();
+    }
   }
 
   // --- Tab Navigation ---
@@ -45,6 +64,9 @@ export default class SecurityAdvisor extends LightningElement {
   handleTabClick(event) {
     this.activeTab = event.currentTarget.dataset.tab;
     this.searchTerm = "";
+    if (this.activeTab === "AUDIT" && !this.hasLoadedAudit) {
+      this.loadAuditTrails();
+    }
   }
 
   handleKpiClick(event) {
@@ -52,6 +74,9 @@ export default class SecurityAdvisor extends LightningElement {
     if (tab) {
       this.activeTab = tab;
       this.searchTerm = "";
+      if (this.activeTab === "AUDIT" && !this.hasLoadedAudit) {
+        this.loadAuditTrails();
+      }
     }
   }
 
@@ -77,6 +102,10 @@ export default class SecurityAdvisor extends LightningElement {
     return this.activeTab === "REDUNDANT";
   }
 
+  get isAuditTab() {
+    return this.activeTab === "AUDIT";
+  }
+
   get criticalTabClass() {
     return `nav-pill ${this.activeTab === "CRITICAL" ? "active" : ""}`;
   }
@@ -91,6 +120,30 @@ export default class SecurityAdvisor extends LightningElement {
 
   get redundantTabClass() {
     return `nav-pill ${this.activeTab === "REDUNDANT" ? "active" : ""}`;
+  }
+
+  get auditTabClass() {
+    return `nav-pill ${this.activeTab === "AUDIT" ? "active" : ""}`;
+  }
+
+  get showGeneralSearchBar() {
+    return !this.isAuditTab;
+  }
+
+  get totalAuditCount() {
+    return this.auditTrails ? this.auditTrails.length : 0;
+  }
+
+  get auditSectionOptions() {
+    const opts = [{ label: "All Sections", value: "ALL" }];
+    (this.auditSections || []).forEach((sec) => {
+      opts.push({ label: sec, value: sec });
+    });
+    return opts;
+  }
+
+  get filteredAuditTrails() {
+    return this.auditTrails || [];
   }
 
   get scoreNumber() {
@@ -235,9 +288,161 @@ export default class SecurityAdvisor extends LightningElement {
       }));
   }
 
+  // --- Hygiene Remediation Actions ---
+
+  async handleRemediateAllInactive() {
+    const ids = (this.filteredInactiveAssignments || []).map(
+      (ia) => ia.assignmentId
+    );
+    if (ids.length === 0) return;
+
+    this.isRemediating = true;
+    try {
+      const result = await remediateInactiveUserAssignments({
+        assignmentIds: ids
+      });
+      if (result.isSuccess) {
+        this.showToast("Remediation Complete", result.message, "success");
+        await this.loadSecuritySummary();
+      } else {
+        this.showToast("Notice", result.message, "warning");
+      }
+    } catch (err) {
+      this.showToast(
+        "Remediation Failed",
+        reduceErrors(err).join(", "),
+        "error"
+      );
+    } finally {
+      this.isRemediating = false;
+    }
+  }
+
+  async handleRemediateSingleInactive(event) {
+    const assignmentId = event.currentTarget.dataset.id;
+    if (!assignmentId) return;
+
+    this.isRemediating = true;
+    try {
+      const result = await remediateInactiveUserAssignments({
+        assignmentIds: [assignmentId]
+      });
+      if (result.isSuccess) {
+        this.showToast("Assignment Removed", result.message, "success");
+        await this.loadSecuritySummary();
+      } else {
+        this.showToast("Notice", result.message, "warning");
+      }
+    } catch (err) {
+      this.showToast(
+        "Remediation Failed",
+        reduceErrors(err).join(", "),
+        "error"
+      );
+    } finally {
+      this.isRemediating = false;
+    }
+  }
+
+  async handleRemediateSingleRedundant(event) {
+    const assignmentId = event.currentTarget.dataset.id;
+    if (!assignmentId) return;
+
+    this.isRemediating = true;
+    try {
+      const result = await remediateRedundantAssignment({
+        assignmentId: assignmentId
+      });
+      if (result.isSuccess) {
+        this.showToast("Assignment Removed", result.message, "success");
+        await this.loadSecuritySummary();
+      } else {
+        this.showToast("Notice", result.message, "warning");
+      }
+    } catch (err) {
+      this.showToast(
+        "Remediation Failed",
+        reduceErrors(err).join(", "),
+        "error"
+      );
+    } finally {
+      this.isRemediating = false;
+    }
+  }
+
+  // --- Setup Audit Trail Methods ---
+
+  async loadAuditTrails() {
+    this.isAuditLoading = true;
+    try {
+      if (this.auditSections.length === 0) {
+        const secList = await getAuditTrailSections();
+        this.auditSections = secList || [];
+      }
+      const trails = await getRecentSecurityAuditTrails({
+        sectionFilter: this.selectedAuditSection,
+        searchTerm: this.auditSearchTerm
+      });
+      this.auditTrails = trails || [];
+      this.hasLoadedAudit = true;
+    } catch (err) {
+      this.showToast(
+        "Error Loading Audit Trail",
+        reduceErrors(err).join(", "),
+        "error"
+      );
+    } finally {
+      this.isAuditLoading = false;
+    }
+  }
+
+  handleAuditSectionChange(event) {
+    this.selectedAuditSection = event.detail.value;
+    this.loadAuditTrails();
+  }
+
+  handleAuditSearchChange(event) {
+    this.auditSearchTerm = event.target.value;
+    this.loadAuditTrails();
+  }
+
+  handleRefreshAudit() {
+    this.loadAuditTrails();
+  }
+
+  handleExportAuditCsv() {
+    if (!this.auditTrails || this.auditTrails.length === 0) {
+      this.showToast("Export Notice", "No audit logs to export.", "info");
+      return;
+    }
+
+    const columns = [
+      { label: "Action", fieldName: "action" },
+      { label: "Section", fieldName: "section" },
+      { label: "Details", fieldName: "display" },
+      { label: "Date & Time", fieldName: "createdDateFormatted" },
+      { label: "User", fieldName: "createdByName" },
+      { label: "Delegate User", fieldName: "delegateUser" }
+    ];
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const fileName = `SecuritySetupAuditTrail_${dateStr}.csv`;
+    exportToCsv(columns, this.auditTrails, fileName);
+    this.showToast(
+      "Export Successful",
+      `Exported ${this.auditTrails.length} rows to ${fileName}`,
+      "success"
+    );
+  }
+
   // --- CSV Export Handler ---
 
   handleExportCsv() {
+    if (this.isAuditTab) {
+      this.handleExportAuditCsv();
+      return;
+    }
+
     if (!this.summary) return;
 
     let columns = [];
