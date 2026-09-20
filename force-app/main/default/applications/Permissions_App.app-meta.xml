@@ -18,5 +18,6 @@
     <tabs>Compare_User</tabs>
     <tabs>Record_Access</tabs>
     <tabs>Who_Has_Access</tabs>
+    <tabs>Security_Advisor</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

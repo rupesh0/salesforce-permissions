@@ -1,0 +1,622 @@
+<template>
+  <div class="slds-card security-advisor-container slds-m-around_medium">
+    <!-- Header Banner -->
+    <div class="slds-p-around_medium header-panel">
+      <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+        <div class="slds-m-right_medium header-icon">
+          <lightning-icon
+            icon-name="utility:shield"
+            size="medium"
+            variant="inverse"
+          ></lightning-icon>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+          <h1 class="header-title">
+            Security Health, Risk Scanner & Governance Advisor
+          </h1>
+          <p class="header-subtitle slds-m-top_xx-small">
+            Continuous posture assessment, administrative privilege monitoring,
+            dormant permission set tracking, and least-privilege governance.
+          </p>
+        </div>
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-text-align_right slds-m-top_small-only"
+        >
+          <lightning-button
+            label="Refresh Scan"
+            icon-name="utility:refresh"
+            variant="neutral"
+            onclick={handleRefresh}
+            class="slds-m-right_x-small"
+          ></lightning-button>
+          <lightning-button
+            label="Export Audit (CSV)"
+            icon-name="utility:download"
+            variant="brand"
+            onclick={handleExportCsv}
+          ></lightning-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Panel -->
+    <div class="slds-p-around_medium">
+      <!-- Loading State -->
+      <template lwc:if={isLoading}>
+        <div style="position: relative; height: 260px">
+          <lightning-spinner
+            alternative-text="Scanning Security Health..."
+            size="medium"
+          ></lightning-spinner>
+        </div>
+      </template>
+
+      <template lwc:else>
+        <!-- Executive Overview Grid -->
+        <div class="overview-grid">
+          <!-- Overall Health Score Card -->
+          <div class="score-card">
+            <div class="score-circle" style="color: inherit">
+              <span class={scoreVariantClass}>
+                <span class="score-number">{scoreNumber}</span>
+              </span>
+              <span class="score-out-of">/ 100</span>
+            </div>
+            <div class={scoreVariantClass}>
+              <div class="score-grade">{healthGrade}</div>
+            </div>
+            <div class="score-subtext">Executive Security Health Score</div>
+          </div>
+
+          <!-- KPI Metric Cards Grid -->
+          <div class="kpi-grid">
+            <!-- 1. Critical & High Risks -->
+            <div class="kpi-card" data-tab="CRITICAL" onclick={handleKpiClick}>
+              <div class="kpi-card-header">
+                <span class="kpi-title">Privilege Risks</span>
+                <div
+                  class="kpi-icon-wrapper"
+                  style="background: #fee2e2; color: #dc2626"
+                >
+                  <lightning-icon
+                    icon-name="utility:warning"
+                    size="x-small"
+                    variant="error"
+                  ></lightning-icon>
+                </div>
+              </div>
+              <div class="kpi-value" style="color: #b91c1c">
+                {totalCriticalCount}
+              </div>
+              <div class="kpi-desc">
+                Critical privilege assignments across all active users
+              </div>
+            </div>
+
+            <!-- 2. Dormant Permission Sets -->
+            <div class="kpi-card" data-tab="DORMANT" onclick={handleKpiClick}>
+              <div class="kpi-card-header">
+                <span class="kpi-title">Dormant Sets</span>
+                <div
+                  class="kpi-icon-wrapper"
+                  style="background: #fef3c7; color: #d97706"
+                >
+                  <lightning-icon
+                    icon-name="utility:archive"
+                    size="x-small"
+                    variant="warning"
+                  ></lightning-icon>
+                </div>
+              </div>
+              <div class="kpi-value" style="color: #b45309">
+                {totalDormantCount}
+              </div>
+              <div class="kpi-desc">
+                Custom permission sets with 0 active user assignments
+              </div>
+            </div>
+
+            <!-- 3. Inactive User Assignments -->
+            <div class="kpi-card" data-tab="INACTIVE" onclick={handleKpiClick}>
+              <div class="kpi-card-header">
+                <span class="kpi-title">Inactive Users</span>
+                <div
+                  class="kpi-icon-wrapper"
+                  style="background: #ede9fe; color: #7c3aed"
+                >
+                  <lightning-icon
+                    icon-name="utility:user"
+                    size="x-small"
+                  ></lightning-icon>
+                </div>
+              </div>
+              <div class="kpi-value" style="color: #6d28d9">
+                {totalInactiveCount}
+              </div>
+              <div class="kpi-desc">
+                Inactive user accounts holding custom permission sets
+              </div>
+            </div>
+
+            <!-- 4. Redundant Assignments -->
+            <div class="kpi-card" data-tab="REDUNDANT" onclick={handleKpiClick}>
+              <div class="kpi-card-header">
+                <span class="kpi-title">Redundant Admin</span>
+                <div
+                  class="kpi-icon-wrapper"
+                  style="background: #e0f2fe; color: #0284c7"
+                >
+                  <lightning-icon
+                    icon-name="utility:copy"
+                    size="x-small"
+                  ></lightning-icon>
+                </div>
+              </div>
+              <div class="kpi-value" style="color: #0369a1">
+                {totalRedundantCount}
+              </div>
+              <div class="kpi-desc">
+                Redundant admin permission sets assigned to System Admins
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scanner View Navigation Pills -->
+        <div class="nav-pills">
+          <button
+            class={criticalTabClass}
+            data-tab="CRITICAL"
+            onclick={handleTabClick}
+          >
+            <lightning-icon
+              icon-name="utility:shield"
+              size="xx-small"
+              class="slds-m-right_xx-small"
+            ></lightning-icon>
+            Critical Privileges Scanner
+            <span class="badge">{filteredCriticalFindings.length}</span>
+          </button>
+          <button
+            class={dormantTabClass}
+            data-tab="DORMANT"
+            onclick={handleTabClick}
+          >
+            <lightning-icon
+              icon-name="utility:archive"
+              size="xx-small"
+              class="slds-m-right_xx-small"
+            ></lightning-icon>
+            Dormant Permission Sets
+            <span class="badge">{filteredDormantSets.length}</span>
+          </button>
+          <button
+            class={inactiveTabClass}
+            data-tab="INACTIVE"
+            onclick={handleTabClick}
+          >
+            <lightning-icon
+              icon-name="utility:user"
+              size="xx-small"
+              class="slds-m-right_xx-small"
+            ></lightning-icon>
+            Inactive Users with Assignments
+            <span class="badge">{filteredInactiveAssignments.length}</span>
+          </button>
+          <button
+            class={redundantTabClass}
+            data-tab="REDUNDANT"
+            onclick={handleTabClick}
+          >
+            <lightning-icon
+              icon-name="utility:copy"
+              size="xx-small"
+              class="slds-m-right_xx-small"
+            ></lightning-icon>
+            Redundant Admin Assignments
+            <span class="badge">{filteredRedundantAssignments.length}</span>
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div
+          class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium"
+        >
+          <div class="search-input-wrapper">
+            <lightning-input
+              type="search"
+              variant="label-hidden"
+              placeholder="Search findings in this view..."
+              value={searchTerm}
+              onchange={handleSearchChange}
+            ></lightning-input>
+          </div>
+        </div>
+
+        <!-- Tab 1: Critical Privileges Scanner Table -->
+        <template lwc:if={isCriticalTab}>
+          <template lwc:if={filteredCriticalFindings.length}>
+            <div class="slds-scrollable_x">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width: 22%">Privilege Name</th>
+                    <th style="width: 12%">Severity</th>
+                    <th style="width: 36%">Description & Impact</th>
+                    <th style="width: 12%; text-align: center">Total Users</th>
+                    <th style="width: 18%; text-align: center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template
+                    for:each={filteredCriticalFindings}
+                    for:item="finding"
+                  >
+                    <tr key={finding.id}>
+                      <td>
+                        <div class="slds-text-title_bold">
+                          {finding.permissionLabel}
+                        </div>
+                        <div
+                          class="slds-text-body_small slds-text-color_weak font-code"
+                        >
+                          {finding.permissionApiName}
+                        </div>
+                      </td>
+                      <td>
+                        <span class={finding.severityClass}>
+                          {finding.severity}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="slds-text-body_small">
+                          {finding.description}
+                        </div>
+                      </td>
+                      <td style="text-align: center">
+                        <div
+                          class="slds-text-title_bold font-weight-700"
+                          style="font-size: 1rem"
+                        >
+                          {finding.affectedUsersCount}
+                        </div>
+                        <template lwc:if={finding.hasNonAdminWarning}>
+                          <span class="non-admin-badge slds-m-top_xx-small">
+                            {finding.nonAdminUsersCount} Non-Admin
+                          </span>
+                        </template>
+                      </td>
+                      <td style="text-align: center">
+                        <button
+                          class="slds-button slds-button_neutral slds-button_small"
+                          data-id={finding.id}
+                          onclick={handleViewUsers}
+                        >
+                          <lightning-icon
+                            icon-name="utility:user"
+                            size="xx-small"
+                            class="slds-m-right_xx-small"
+                          ></lightning-icon>
+                          View Users ({finding.affectedUsersCount})
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="empty-state">
+              <lightning-icon
+                icon-name="utility:check"
+                size="medium"
+                variant="success"
+              ></lightning-icon>
+              <div
+                class="slds-m-top_small slds-text-heading_small font-weight-700"
+              >
+                No Critical Privileges Found
+              </div>
+              <p class="slds-text-body_small slds-text-color_weak">
+                No active users match this search criteria.
+              </p>
+            </div>
+          </template>
+        </template>
+
+        <!-- Tab 2: Dormant Permission Sets Table -->
+        <template lwc:if={isDormantTab}>
+          <template lwc:if={filteredDormantSets.length}>
+            <div class="slds-scrollable_x">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Permission Set Label</th>
+                    <th style="width: 20%">API Name</th>
+                    <th style="width: 35%">Description</th>
+                    <th style="width: 20%">Governance Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={filteredDormantSets} for:item="ps">
+                    <tr key={ps.permissionSetId}>
+                      <td>
+                        <div class="slds-text-title_bold">{ps.label}</div>
+                      </td>
+                      <td class="font-code slds-text-color_weak">{ps.name}</td>
+                      <td>
+                        <span class="slds-text-body_small">
+                          {ps.description}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="severity-badge medium">
+                          0 Active Assignments
+                        </span>
+                        <div
+                          class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+                        >
+                          Candidate for deprecation
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="empty-state">
+              <lightning-icon
+                icon-name="utility:check"
+                size="medium"
+                variant="success"
+              ></lightning-icon>
+              <div
+                class="slds-m-top_small slds-text-heading_small font-weight-700"
+              >
+                No Dormant Permission Sets
+              </div>
+              <p class="slds-text-body_small slds-text-color_weak">
+                All custom permission sets have active user assignments.
+              </p>
+            </div>
+          </template>
+        </template>
+
+        <!-- Tab 3: Inactive Users with Assignments Table -->
+        <template lwc:if={isInactiveTab}>
+          <template lwc:if={filteredInactiveAssignments.length}>
+            <div class="slds-scrollable_x">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Inactive User</th>
+                    <th style="width: 20%">Username</th>
+                    <th style="width: 20%">Assigned Permission Set</th>
+                    <th style="width: 35%">Recommendation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template
+                    for:each={filteredInactiveAssignments}
+                    for:item="ia"
+                  >
+                    <tr key={ia.assignmentId}>
+                      <td>
+                        <div class="slds-text-title_bold">
+                          {ia.userFullName}
+                        </div>
+                        <div class="slds-text-body_small slds-text-color_weak">
+                          {ia.profileName}
+                        </div>
+                      </td>
+                      <td class="font-code slds-text-color_weak">
+                        {ia.username}
+                      </td>
+                      <td>
+                        <div class="slds-text-title_bold">
+                          {ia.permissionSetLabel}
+                        </div>
+                        <div
+                          class="font-code slds-text-body_small slds-text-color_weak"
+                        >
+                          {ia.permissionSetName}
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          class="severity-badge high slds-m-bottom_xx-small"
+                        >
+                          Stale Assignment
+                        </span>
+                        <div class="slds-text-body_small slds-text-color_weak">
+                          Remove permission set assignment from inactive user to
+                          prevent credential misuse and cleanup audit logs.
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="empty-state">
+              <lightning-icon
+                icon-name="utility:check"
+                size="medium"
+                variant="success"
+              ></lightning-icon>
+              <div
+                class="slds-m-top_small slds-text-heading_small font-weight-700"
+              >
+                No Inactive User Assignments
+              </div>
+              <p class="slds-text-body_small slds-text-color_weak">
+                No deactivated users are holding custom permission set
+                assignments.
+              </p>
+            </div>
+          </template>
+        </template>
+
+        <!-- Tab 4: Redundant Admin Assignments Table -->
+        <template lwc:if={isRedundantTab}>
+          <template lwc:if={filteredRedundantAssignments.length}>
+            <div class="slds-scrollable_x">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width: 22%">Admin User</th>
+                    <th style="width: 18%">Profile</th>
+                    <th style="width: 25%">Assigned Permission Set</th>
+                    <th style="width: 35%">
+                      Redundant Capabilities & Advisory
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template
+                    for:each={filteredRedundantAssignments}
+                    for:item="ra"
+                  >
+                    <tr key={ra.userId}>
+                      <td>
+                        <div class="slds-text-title_bold">{ra.userName}</div>
+                      </td>
+                      <td>
+                        <span class="admin-badge">{ra.profileName}</span>
+                      </td>
+                      <td>
+                        <div class="slds-text-title_bold">
+                          {ra.permissionSetLabel}
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="slds-text-title_bold font-weight-700 slds-text-color_error"
+                        >
+                          {ra.redundantPermission}
+                        </div>
+                        <div
+                          class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+                        >
+                          {ra.reason}
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="empty-state">
+              <lightning-icon
+                icon-name="utility:check"
+                size="medium"
+                variant="success"
+              ></lightning-icon>
+              <div
+                class="slds-m-top_small slds-text-heading_small font-weight-700"
+              >
+                No Redundant Admin Assignments
+              </div>
+              <p class="slds-text-body_small slds-text-color_weak">
+                No System Administrator profile users are assigned redundant
+                admin permission sets.
+              </p>
+            </div>
+          </template>
+        </template>
+      </template>
+    </div>
+
+    <!-- Affected Users Modal -->
+    <template lwc:if={isModalOpen}>
+      <div class="modal-backdrop" onclick={handleCloseModal}></div>
+      <div class="modal-container">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div>
+            <h2 class="slds-text-heading_small font-weight-700">
+              Users Granted: {selectedFinding.permissionLabel}
+            </h2>
+            <p class="slds-text-body_small" style="color: #94a3b8">
+              {selectedFinding.permissionApiName} •
+              {selectedFinding.affectedUsersCount} Total Users
+            </p>
+          </div>
+          <button
+            class="slds-button slds-button_icon slds-button_icon-inverse"
+            onclick={handleCloseModal}
+            title="Close"
+          >
+            <lightning-icon
+              icon-name="utility:close"
+              size="small"
+              variant="inverse"
+            ></lightning-icon>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <div class="slds-m-bottom_medium">
+            <lightning-input
+              type="search"
+              variant="label-hidden"
+              placeholder="Search user, profile, or grant source..."
+              value={modalSearchTerm}
+              onchange={handleModalSearch}
+            ></lightning-input>
+          </div>
+
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th style="width: 25%">User Name</th>
+                <th style="width: 25%">Username</th>
+                <th style="width: 20%">Profile</th>
+                <th style="width: 15%">Access Role</th>
+                <th style="width: 15%">Grant Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={filteredModalUsers} for:item="u">
+                <tr key={u.userId}>
+                  <td>
+                    <div class="slds-text-title_bold">{u.name}</div>
+                  </td>
+                  <td class="font-code slds-text-color_weak">{u.username}</td>
+                  <td>{u.profileName}</td>
+                  <td>
+                    <span class={u.badgeClass}> {u.badgeLabel} </span>
+                  </td>
+                  <td>
+                    <span
+                      class="slds-text-body_small slds-text-color_weak font-weight-600"
+                    >
+                      {u.grantSource}
+                    </span>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <lightning-button
+            label="Close"
+            variant="neutral"
+            onclick={handleCloseModal}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
