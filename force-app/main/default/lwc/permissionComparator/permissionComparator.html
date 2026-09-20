@@ -1,0 +1,674 @@
+<template>
+  <div class="slds-card comparator-container slds-m-around_medium">
+    <!-- Header Banner -->
+    <div class="slds-p-around_medium header-panel">
+      <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+        <div class="slds-m-right_medium header-icon">
+          <lightning-icon
+            icon-name="utility:compare"
+            size="medium"
+            variant="inverse"
+          ></lightning-icon>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+          <h1 class="header-title">Profile & Permission Set Comparator</h1>
+          <p class="header-subtitle slds-m-top_xx-small">
+            Direct side-by-side comparison across Profiles, Permission Sets, and
+            Permission Set Groups with deep PSG Muting Inspection.
+          </p>
+        </div>
+        <!-- Mode Switcher -->
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-text-align_center slds-m-top_small-only"
+        >
+          <div class="mode-pill-container">
+            <div
+              class={comparatorModeClass}
+              data-mode="COMPARATOR"
+              onclick={handleSwitchMode}
+            >
+              Entity Comparator
+            </div>
+            <div
+              class={psgModeClass}
+              data-mode="PSG_INSPECTOR"
+              onclick={handleSwitchMode}
+            >
+              PSG & Muting Inspector
+            </div>
+          </div>
+        </div>
+        <!-- Action Buttons -->
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-text-align_right slds-m-top_small-only"
+        >
+          <lightning-button
+            label="Export (CSV)"
+            icon-name="utility:download"
+            variant="brand"
+            onclick={handleExportCsv}
+          ></lightning-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode 1: Entity Comparator View -->
+    <template lwc:if={isComparatorMode}>
+      <div class="slds-p-around_medium">
+        <!-- Dual Entity Selectors -->
+        <div
+          class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-center slds-m-bottom_medium"
+        >
+          <!-- Left Entity Selector -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+            <div class="entity-selection-card">
+              <label
+                class="slds-form-element__label slds-text-title_bold slds-m-bottom_xx-small"
+                style="display: block"
+              >
+                Left Entity (Baseline)
+              </label>
+              <!-- Type Pills -->
+              <div class="entity-type-group">
+                <button
+                  class={leftProfilePillClass}
+                  data-type="PROFILE"
+                  onclick={handleLeftTypeSelect}
+                >
+                  Profile
+                </button>
+                <button
+                  class={leftPSPillClass}
+                  data-type="PERMISSION_SET"
+                  onclick={handleLeftTypeSelect}
+                >
+                  Permission Set
+                </button>
+                <button
+                  class={leftPSGPillClass}
+                  data-type="PERMISSION_SET_GROUP"
+                  onclick={handleLeftTypeSelect}
+                >
+                  Permission Set Group
+                </button>
+              </div>
+
+              <!-- Selected Card vs Search Input -->
+              <template lwc:if={leftSelected}>
+                <div class="entity-selected-badge">
+                  <div class="slds-truncate">
+                    <div class="slds-text-title_bold slds-truncate">
+                      {leftSelected.label}
+                    </div>
+                    <div class="slds-m-top_xx-small">
+                      <span class={leftTagClass}
+                        >{leftSelected.entityType}</span
+                      >
+                      <span
+                        class="slds-text-body_small slds-text-color_weak slds-m-left_x-small slds-truncate font-code"
+                      >
+                        {leftSelected.name}
+                      </span>
+                    </div>
+                  </div>
+                  <lightning-button-icon
+                    icon-name="utility:close"
+                    variant="bare"
+                    alternative-text="Change Entity"
+                    title="Change Entity"
+                    onclick={handleLeftClear}
+                  ></lightning-button-icon>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="slds-is-relative">
+                  <lightning-input
+                    variant="label-hidden"
+                    type="search"
+                    placeholder="Search by label or API name..."
+                    value={leftSearchTerm}
+                    onfocus={handleLeftFocus}
+                    onblur={handleLeftBlur}
+                    onchange={handleLeftSearchInput}
+                    is-loading={isLeftLoading}
+                  ></lightning-input>
+                  <template lwc:if={showLeftDropdown}>
+                    <div class="dropdown-container">
+                      <template for:each={leftOptions} for:item="opt">
+                        <div
+                          key={opt.id}
+                          class="dropdown-item"
+                          data-id={opt.id}
+                          onmousedown={handleLeftSelect}
+                        >
+                          <div class="slds-text-title_bold">{opt.label}</div>
+                          <div
+                            class="slds-text-body_small slds-text-color_weak font-code"
+                          >
+                            {opt.name}
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Center Swap Button -->
+          <div
+            class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-text-align_center slds-m-vertical_small"
+          >
+            <button
+              class="slds-button slds-button_neutral slds-button_icon"
+              title="Swap Left and Right Entities"
+              onclick={handleSwapEntities}
+              style="border-radius: 50%; width: 42px; height: 42px"
+            >
+              <lightning-icon
+                icon-name="utility:rotate"
+                size="x-small"
+              ></lightning-icon>
+            </button>
+            <div
+              class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+            >
+              Swap
+            </div>
+          </div>
+
+          <!-- Right Entity Selector -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+            <div class="entity-selection-card">
+              <label
+                class="slds-form-element__label slds-text-title_bold slds-m-bottom_xx-small"
+                style="display: block"
+              >
+                Right Entity (Comparison Target)
+              </label>
+              <!-- Type Pills -->
+              <div class="entity-type-group">
+                <button
+                  class={rightProfilePillClass}
+                  data-type="PROFILE"
+                  onclick={handleRightTypeSelect}
+                >
+                  Profile
+                </button>
+                <button
+                  class={rightPSPillClass}
+                  data-type="PERMISSION_SET"
+                  onclick={handleRightTypeSelect}
+                >
+                  Permission Set
+                </button>
+                <button
+                  class={rightPSGPillClass}
+                  data-type="PERMISSION_SET_GROUP"
+                  onclick={handleRightTypeSelect}
+                >
+                  Permission Set Group
+                </button>
+              </div>
+
+              <!-- Selected Card vs Search Input -->
+              <template lwc:if={rightSelected}>
+                <div class="entity-selected-badge">
+                  <div class="slds-truncate">
+                    <div class="slds-text-title_bold slds-truncate">
+                      {rightSelected.label}
+                    </div>
+                    <div class="slds-m-top_xx-small">
+                      <span class={rightTagClass}
+                        >{rightSelected.entityType}</span
+                      >
+                      <span
+                        class="slds-text-body_small slds-text-color_weak slds-m-left_x-small slds-truncate font-code"
+                      >
+                        {rightSelected.name}
+                      </span>
+                    </div>
+                  </div>
+                  <lightning-button-icon
+                    icon-name="utility:close"
+                    variant="bare"
+                    alternative-text="Change Entity"
+                    title="Change Entity"
+                    onclick={handleRightClear}
+                  ></lightning-button-icon>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="slds-is-relative">
+                  <lightning-input
+                    variant="label-hidden"
+                    type="search"
+                    placeholder="Search by label or API name..."
+                    value={rightSearchTerm}
+                    onfocus={handleRightFocus}
+                    onblur={handleRightBlur}
+                    onchange={handleRightSearchInput}
+                    is-loading={isRightLoading}
+                  ></lightning-input>
+                  <template lwc:if={showRightDropdown}>
+                    <div class="dropdown-container">
+                      <template for:each={rightOptions} for:item="opt">
+                        <div
+                          key={opt.id}
+                          class="dropdown-item"
+                          data-id={opt.id}
+                          onmousedown={handleRightSelect}
+                        >
+                          <div class="slds-text-title_bold">{opt.label}</div>
+                          <div
+                            class="slds-text-body_small slds-text-color_weak font-code"
+                          >
+                            {opt.name}
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Controls Strip -->
+        <div
+          class="slds-grid slds-grid_vertical-align-center slds-wrap slds-m-bottom_medium"
+          style="gap: 0.75rem"
+        >
+          <!-- Category Pills -->
+          <div class="filter-strip">
+            <button
+              class={objectCategoryClass}
+              data-category="OBJECT"
+              onclick={handleCategorySelect}
+            >
+              <lightning-icon
+                icon-name="utility:database"
+                size="xx-small"
+                class="slds-m-right_xx-small"
+              ></lightning-icon>
+              Object Permissions (CRUD)
+            </button>
+            <button
+              class={fieldCategoryClass}
+              data-category="FIELD"
+              onclick={handleCategorySelect}
+            >
+              <lightning-icon
+                icon-name="utility:table"
+                size="xx-small"
+                class="slds-m-right_xx-small"
+              ></lightning-icon>
+              Field Permissions (FLS)
+            </button>
+            <button
+              class={systemCategoryClass}
+              data-category="SYSTEM"
+              onclick={handleCategorySelect}
+            >
+              <lightning-icon
+                icon-name="utility:settings"
+                size="xx-small"
+                class="slds-m-right_xx-small"
+              ></lightning-icon>
+              System Permissions
+            </button>
+            <button
+              class={apexCategoryClass}
+              data-category="APEX"
+              onclick={handleCategorySelect}
+            >
+              <lightning-icon
+                icon-name="utility:apex"
+                size="xx-small"
+                class="slds-m-right_xx-small"
+              ></lightning-icon>
+              Apex Classes
+            </button>
+            <button
+              class={flowCategoryClass}
+              data-category="FLOW"
+              onclick={handleCategorySelect}
+            >
+              <lightning-icon
+                icon-name="utility:flow"
+                size="xx-small"
+                class="slds-m-right_xx-small"
+              ></lightning-icon>
+              Flows
+            </button>
+          </div>
+
+          <!-- Diff Filter Pills -->
+          <div class="filter-strip slds-m-left_auto">
+            <button
+              class={diffOnlyClass}
+              data-filter="DIFF"
+              onclick={handleDiffFilterSelect}
+            >
+              Differences Only ({diffCount})
+            </button>
+            <button
+              class={allDiffClass}
+              data-filter="ALL"
+              onclick={handleDiffFilterSelect}
+            >
+              All ({totalComparedCount})
+            </button>
+            <button
+              class={leftOnlyClass}
+              data-filter="LEFT_ONLY"
+              onclick={handleDiffFilterSelect}
+            >
+              Left Only ({leftOnlyCount})
+            </button>
+            <button
+              class={rightOnlyClass}
+              data-filter="RIGHT_ONLY"
+              onclick={handleDiffFilterSelect}
+            >
+              Right Only ({rightOnlyCount})
+            </button>
+            <button
+              class={identicalDiffClass}
+              data-filter="IDENTICAL"
+              onclick={handleDiffFilterSelect}
+            >
+              Identical ({identicalCount})
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="metrics-strip">
+          <div class="metric-item">
+            <span class="metric-label">Total Compared:</span>
+            <span class="metric-val total">{totalComparedCount}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Differences:</span>
+            <span class="metric-val diff">{diffCount}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Left Only:</span>
+            <span class="metric-val left">{leftOnlyCount}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Right Only:</span>
+            <span class="metric-val right">{rightOnlyCount}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Identical:</span>
+            <span class="metric-val ident">{identicalCount}</span>
+          </div>
+        </div>
+
+        <!-- In-Table Search Bar -->
+        <div class="slds-m-bottom_medium" style="max-width: 320px">
+          <lightning-input
+            type="search"
+            variant="label-hidden"
+            placeholder="Search items in this view..."
+            value={rowSearchTerm}
+            onchange={handleRowSearchChange}
+          ></lightning-input>
+        </div>
+
+        <!-- Comparison Data Table -->
+        <template lwc:if={isLoadingComparison}>
+          <div style="position: relative; height: 200px">
+            <lightning-spinner
+              alternative-text="Comparing Permissions..."
+              size="medium"
+            ></lightning-spinner>
+          </div>
+        </template>
+        <template lwc:else>
+          <template lwc:if={filteredComparisonRows.length}>
+            <div class="slds-scrollable_x">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Item / Permission</th>
+                    <th style="width: 15%; text-align: center">Diff Status</th>
+                    <th style="width: 30%">{leftSelected.label} (Left)</th>
+                    <th style="width: 30%">{rightSelected.label} (Right)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={filteredComparisonRows} for:item="row">
+                    <tr key={row.itemKey}>
+                      <td>
+                        <div class="slds-text-title_bold">{row.itemLabel}</div>
+                        <div
+                          class="slds-text-body_small slds-text-color_weak font-code"
+                        >
+                          {row.itemKey}
+                        </div>
+                      </td>
+                      <td style="text-align: center">
+                        <span class={row.badgeClass}> {row.badgeLabel} </span>
+                      </td>
+                      <td class="access-cell">{row.leftAccess}</td>
+                      <td class="access-cell">{row.rightAccess}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="empty-state">
+              <lightning-icon
+                icon-name="utility:check"
+                size="medium"
+                variant="success"
+              ></lightning-icon>
+              <div
+                class="slds-m-top_small slds-text-heading_small font-weight-700"
+              >
+                No Differences Found
+              </div>
+              <p class="slds-text-body_small slds-text-color_weak">
+                No items match the active filter criteria.
+              </p>
+            </div>
+          </template>
+        </template>
+      </div>
+    </template>
+
+    <!-- Mode 2: PSG & Muting Inspector View -->
+    <template lwc:if={isPSGMode}>
+      <div class="slds-p-around_medium">
+        <!-- PSG Selection Bar -->
+        <div
+          class="slds-grid slds-gutters slds-grid_vertical-align-center slds-m-bottom_medium"
+        >
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <lightning-combobox
+              name="psgSelect"
+              label="Select Permission Set Group"
+              value={selectedPSGId}
+              options={psgList}
+              onchange={handlePSGChange}
+            ></lightning-combobox>
+          </div>
+        </div>
+
+        <template lwc:if={isPSGLoading}>
+          <div style="position: relative; height: 220px">
+            <lightning-spinner
+              alternative-text="Loading PSG details..."
+              size="medium"
+            ></lightning-spinner>
+          </div>
+        </template>
+        <template lwc:else>
+          <template lwc:if={psgDetail}>
+            <!-- PSG Overview Card -->
+            <div class="psg-card slds-m-bottom_medium">
+              <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                  <div class="slds-text-heading_small font-weight-700">
+                    {psgDetail.masterLabel}
+                  </div>
+                  <div
+                    class="font-code slds-text-body_small slds-text-color_weak"
+                  >
+                    {psgDetail.developerName}
+                  </div>
+                  <p class="slds-text-body_small slds-m-top_xx-small">
+                    {psgDetail.description}
+                  </p>
+                </div>
+                <div
+                  class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-text-align_right"
+                >
+                  <span class="slds-badge slds-theme_info slds-m-right_xx-small"
+                    >Status: {psgDetail.status}</span
+                  >
+                  <template lwc:if={psgDetail.hasMuting}>
+                    <span class="muting-badge muted">Muting Configured</span>
+                  </template>
+                  <template lwc:else>
+                    <span class="muting-badge active">No Muting</span>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Two Column Layout: Bundled Sets & Muting Impact -->
+            <div class="slds-grid slds-gutters slds-wrap">
+              <!-- Left: Bundled Permission Sets -->
+              <div
+                class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_medium"
+              >
+                <div class="slds-card slds-p-around_small slds-border">
+                  <h3 class="slds-text-title_bold slds-m-bottom_small">
+                    Bundled Permission Sets
+                    ({psgDetail.bundledPermissionSets.length})
+                  </h3>
+                  <template
+                    for:each={psgDetail.bundledPermissionSets}
+                    for:item="b"
+                  >
+                    <div
+                      key={b.id}
+                      class="slds-box slds-box_x-small slds-m-bottom_x-small"
+                    >
+                      <div class="slds-text-title_bold">{b.label}</div>
+                      <div
+                        class="font-code slds-text-body_small slds-text-color_weak"
+                      >
+                        {b.name}
+                      </div>
+                      <div class="slds-text-body_small slds-m-top_xx-small">
+                        {b.description}
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Right: Muting Impact Matrix -->
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                <div class="slds-card slds-p-around_small slds-border">
+                  <div
+                    class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small"
+                  >
+                    <h3 class="slds-text-title_bold">
+                      Muting & Effective Access Matrix
+                    </h3>
+                    <div class="slds-col_bump-left" style="max-width: 240px">
+                      <lightning-input
+                        type="search"
+                        variant="label-hidden"
+                        placeholder="Search objects..."
+                        value={psgSearchTerm}
+                        onchange={handlePSGSearchChange}
+                      ></lightning-input>
+                    </div>
+                  </div>
+
+                  <template lwc:if={filteredMutingImpactRows.length}>
+                    <div class="slds-scrollable_x">
+                      <table class="custom-table">
+                        <thead>
+                          <tr>
+                            <th style="width: 25%">Object</th>
+                            <th style="width: 30%">Base Bundled Access</th>
+                            <th style="width: 15%; text-align: center">
+                              Muting Status
+                            </th>
+                            <th style="width: 30%">Effective Access</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <template
+                            for:each={filteredMutingImpactRows}
+                            for:item="row"
+                          >
+                            <tr key={row.objectName}>
+                              <td>
+                                <div class="slds-text-title_bold">
+                                  {row.objectName}
+                                </div>
+                                <div
+                                  class="slds-text-body_small slds-text-color_weak"
+                                >
+                                  From: {row.bundledSources}
+                                </div>
+                              </td>
+                              <td class="access-cell">{row.bundledAccess}</td>
+                              <td style="text-align: center">
+                                <span class={row.badgeClass}>
+                                  {row.badgeLabel}
+                                </span>
+                                <template lwc:if={row.isMuted}>
+                                  <div
+                                    class="slds-text-body_small slds-text-color_error slds-m-top_xx-small"
+                                  >
+                                    Revoked: {row.mutedPermissions}
+                                  </div>
+                                </template>
+                              </td>
+                              <td class="access-cell">{row.effectiveAccess}</td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </template>
+                  <template lwc:else>
+                    <div class="empty-state">
+                      <lightning-icon
+                        icon-name="utility:info"
+                        size="medium"
+                      ></lightning-icon>
+                      <div
+                        class="slds-m-top_small slds-text-heading_small font-weight-700"
+                      >
+                        No Muting Impact Data
+                      </div>
+                      <p class="slds-text-body_small slds-text-color_weak">
+                        No object permissions found for this Permission Set
+                        Group.
+                      </p>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

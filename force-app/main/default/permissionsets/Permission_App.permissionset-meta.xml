@@ -57,6 +57,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>PermissionComparatorController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>PermissionsController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -100,6 +104,10 @@
     </tabSettings>
     <tabSettings>
         <tab>My_Permissions</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Permission_Comparator</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
