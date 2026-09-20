@@ -93,7 +93,13 @@ Proactively scan the org for permission sprawl, dangerous privilege assignments,
 
 ---
 
-## Phase 3: Permission Set & Profile Comparator & PSG Muting Inspector
+## Phase 3: Permission Set & Profile Comparator & PSG Muting Inspector [COMPLETED]
+
+### Status: Complete & Deployed
+
+- **Apex**: `PermissionComparatorController.cls`, `PermissionComparatorControllerTest.cls` (100% test pass)
+- **LWC**: `c/permissionComparator` (Dual entity comparison, diff badges, PSG & muting inspector, CSV export)
+- **Metadata**: Custom Tab `Permission_Comparator`, FlexiPage `Permission_Comparator`, `Permissions_App`, `Permission_App`
 
 ### Objectives
 
@@ -103,17 +109,24 @@ Empower administrators to refactor legacy Profiles into modern Permission Sets a
 
 1. **Direct Profile & Permission Set Comparator**:
    - Compare Profile vs Profile.
+   - Compare Profile vs Permission Set (Profile EOL Migration).
    - Compare Permission Set vs Permission Set.
    - Compare Permission Set Group vs Permission Set Group.
-   - Visual side-by-side diff indicating Shared, Left-Only, and Right-Only permissions.
+   - Cross-comparisons (PSG vs Permission Set, PSG vs Profile).
+   - Visual side-by-side diff indicating Shared, Left-Only, Right-Only, and Different permissions.
+   - Diff filtering: Differences Only, Left Only, Right Only, Identical.
+   - Category filtering: Object CRUD, Field FLS, System Permissions, Apex Classes, Flows.
 2. **Permission Set Group (PSG) & Muting Inspector**:
    - Visual breakdown of bundled Permission Sets inside a PSG.
    - Detailed display of **Muting Permission Set** effects (explicitly displaying what was allowed by the constituent sets but muted for the group).
+   - Effective Access calculation.
+3. **Compliance CSV Export**:
+   - One-click export of comparison diff and muting matrices.
 
 ### Architecture & Components
 
 - **Apex**: `PermissionComparatorController.cls`, `PermissionComparatorControllerTest.cls`
-- **LWC**: `c/permissionComparator`, `c/psgMutingViewer`
+- **LWC**: `c/permissionComparator`
 - **Metadata**: Custom Tab `Permission_Comparator`, FlexiPage `Permission_Comparator`
 
 ---
