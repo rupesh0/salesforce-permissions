@@ -97,7 +97,11 @@ export default class PermissionComparator extends LightningElement {
   // --- Mode Switching ---
 
   handleSwitchMode(event) {
-    this.activeMode = event.currentTarget.dataset.mode;
+    const mode =
+      event.currentTarget?.dataset?.mode ||
+      event.target?.closest("[data-mode]")?.dataset?.mode;
+    if (!mode) return;
+    this.activeMode = mode;
     if (
       this.activeMode === "PSG_INSPECTOR" &&
       this.selectedPSGId &&
@@ -126,9 +130,14 @@ export default class PermissionComparator extends LightningElement {
   // --- Left Entity Handlers ---
 
   handleLeftTypeSelect(event) {
-    this.leftType = event.currentTarget.dataset.type;
+    const type =
+      event.currentTarget?.dataset?.type ||
+      event.target?.closest("[data-type]")?.dataset?.type;
+    if (!type) return;
+    this.leftType = type;
     this.leftSelected = null;
     this.leftSearchTerm = "";
+    this.showLeftDropdown = true;
     this.searchLeftEntities("");
   }
 
@@ -162,31 +171,42 @@ export default class PermissionComparator extends LightningElement {
   }
 
   handleLeftBlur() {
-    debounce(() => {
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    setTimeout(() => {
       this.showLeftDropdown = false;
-    }, 200)();
+    }, 250);
   }
 
   handleLeftSelect(event) {
-    const id = event.currentTarget.dataset.id;
-    this.leftSelected = this.leftOptions.find((o) => o.id === id);
-    this.showLeftDropdown = false;
-    this.runComparison();
+    const id =
+      event.currentTarget?.dataset?.id ||
+      event.target?.closest("[data-id]")?.dataset?.id;
+    if (id) {
+      this.leftSelected = this.leftOptions.find((o) => o.id === id);
+      this.showLeftDropdown = false;
+      this.runComparison();
+    }
   }
 
   handleLeftClear() {
     this.leftSelected = null;
     this.leftSearchTerm = "";
     this.comparisonResult = null;
+    this.showLeftDropdown = true;
     this.searchLeftEntities("");
   }
 
   // --- Right Entity Handlers ---
 
   handleRightTypeSelect(event) {
-    this.rightType = event.currentTarget.dataset.type;
+    const type =
+      event.currentTarget?.dataset?.type ||
+      event.target?.closest("[data-type]")?.dataset?.type;
+    if (!type) return;
+    this.rightType = type;
     this.rightSelected = null;
     this.rightSearchTerm = "";
+    this.showRightDropdown = true;
     this.searchRightEntities("");
   }
 
@@ -220,22 +240,28 @@ export default class PermissionComparator extends LightningElement {
   }
 
   handleRightBlur() {
-    debounce(() => {
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    setTimeout(() => {
       this.showRightDropdown = false;
-    }, 200)();
+    }, 250);
   }
 
   handleRightSelect(event) {
-    const id = event.currentTarget.dataset.id;
-    this.rightSelected = this.rightOptions.find((o) => o.id === id);
-    this.showRightDropdown = false;
-    this.runComparison();
+    const id =
+      event.currentTarget?.dataset?.id ||
+      event.target?.closest("[data-id]")?.dataset?.id;
+    if (id) {
+      this.rightSelected = this.rightOptions.find((o) => o.id === id);
+      this.showRightDropdown = false;
+      this.runComparison();
+    }
   }
 
   handleRightClear() {
     this.rightSelected = null;
     this.rightSearchTerm = "";
     this.comparisonResult = null;
+    this.showRightDropdown = true;
     this.searchRightEntities("");
   }
 
@@ -277,13 +303,23 @@ export default class PermissionComparator extends LightningElement {
   }
 
   handleCategorySelect(event) {
-    this.activeCategory = event.currentTarget.dataset.category;
-    this.rowSearchTerm = "";
-    this.runComparison();
+    const category =
+      event.currentTarget?.dataset?.category ||
+      event.target?.closest("[data-category]")?.dataset?.category;
+    if (category) {
+      this.activeCategory = category;
+      this.rowSearchTerm = "";
+      this.runComparison();
+    }
   }
 
   handleDiffFilterSelect(event) {
-    this.activeDiffFilter = event.currentTarget.dataset.filter;
+    const filter =
+      event.currentTarget?.dataset?.filter ||
+      event.target?.closest("[data-filter]")?.dataset?.filter;
+    if (filter) {
+      this.activeDiffFilter = filter;
+    }
   }
 
   handleRowSearchChange(event) {

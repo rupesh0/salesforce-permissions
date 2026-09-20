@@ -71,6 +71,7 @@
               <!-- Type Pills -->
               <div class="entity-type-group">
                 <button
+                  type="button"
                   class={leftProfilePillClass}
                   data-type="PROFILE"
                   onclick={handleLeftTypeSelect}
@@ -78,6 +79,7 @@
                   Profile
                 </button>
                 <button
+                  type="button"
                   class={leftPSPillClass}
                   data-type="PERMISSION_SET"
                   onclick={handleLeftTypeSelect}
@@ -85,6 +87,7 @@
                   Permission Set
                 </button>
                 <button
+                  type="button"
                   class={leftPSGPillClass}
                   data-type="PERMISSION_SET_GROUP"
                   onclick={handleLeftTypeSelect}
@@ -161,6 +164,7 @@
             class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-text-align_center slds-m-vertical_small"
           >
             <button
+              type="button"
               class="slds-button slds-button_neutral slds-button_icon"
               title="Swap Left and Right Entities"
               onclick={handleSwapEntities}
@@ -190,6 +194,7 @@
               <!-- Type Pills -->
               <div class="entity-type-group">
                 <button
+                  type="button"
                   class={rightProfilePillClass}
                   data-type="PROFILE"
                   onclick={handleRightTypeSelect}
@@ -197,6 +202,7 @@
                   Profile
                 </button>
                 <button
+                  type="button"
                   class={rightPSPillClass}
                   data-type="PERMISSION_SET"
                   onclick={handleRightTypeSelect}
@@ -204,6 +210,7 @@
                   Permission Set
                 </button>
                 <button
+                  type="button"
                   class={rightPSGPillClass}
                   data-type="PERMISSION_SET_GROUP"
                   onclick={handleRightTypeSelect}
@@ -284,6 +291,7 @@
           <!-- Category Pills -->
           <div class="filter-strip">
             <button
+              type="button"
               class={objectCategoryClass}
               data-category="OBJECT"
               onclick={handleCategorySelect}
@@ -296,6 +304,7 @@
               Object Permissions (CRUD)
             </button>
             <button
+              type="button"
               class={fieldCategoryClass}
               data-category="FIELD"
               onclick={handleCategorySelect}
@@ -308,6 +317,7 @@
               Field Permissions (FLS)
             </button>
             <button
+              type="button"
               class={systemCategoryClass}
               data-category="SYSTEM"
               onclick={handleCategorySelect}
@@ -320,6 +330,7 @@
               System Permissions
             </button>
             <button
+              type="button"
               class={apexCategoryClass}
               data-category="APEX"
               onclick={handleCategorySelect}
@@ -332,6 +343,7 @@
               Apex Classes
             </button>
             <button
+              type="button"
               class={flowCategoryClass}
               data-category="FLOW"
               onclick={handleCategorySelect}
@@ -348,6 +360,7 @@
           <!-- Diff Filter Pills -->
           <div class="filter-strip slds-m-left_auto">
             <button
+              type="button"
               class={diffOnlyClass}
               data-filter="DIFF"
               onclick={handleDiffFilterSelect}
@@ -355,6 +368,7 @@
               Differences Only ({diffCount})
             </button>
             <button
+              type="button"
               class={allDiffClass}
               data-filter="ALL"
               onclick={handleDiffFilterSelect}
@@ -362,6 +376,7 @@
               All ({totalComparedCount})
             </button>
             <button
+              type="button"
               class={leftOnlyClass}
               data-filter="LEFT_ONLY"
               onclick={handleDiffFilterSelect}
@@ -369,6 +384,7 @@
               Left Only ({leftOnlyCount})
             </button>
             <button
+              type="button"
               class={rightOnlyClass}
               data-filter="RIGHT_ONLY"
               onclick={handleDiffFilterSelect}
@@ -376,6 +392,7 @@
               Right Only ({rightOnlyCount})
             </button>
             <button
+              type="button"
               class={identicalDiffClass}
               data-filter="IDENTICAL"
               onclick={handleDiffFilterSelect}
