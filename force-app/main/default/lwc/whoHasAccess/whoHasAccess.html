@@ -1,0 +1,360 @@
+<template>
+  <div class="slds-card who-has-access-container slds-m-around_medium">
+    <!-- Header Banner -->
+    <div class="slds-p-around_medium header-panel">
+      <div class="slds-grid slds-grid_vertical-align-center">
+        <div class="slds-m-right_medium header-icon">
+          <lightning-icon
+            icon-name="utility:shield"
+            size="medium"
+            variant="inverse"
+          ></lightning-icon>
+        </div>
+        <div class="slds-col">
+          <h1 class="slds-text-heading_medium font-weight-700" style="color: #ffffff;">
+            Who Has Access? (Security & Compliance Auditor)
+          </h1>
+          <p class="slds-text-body_small" style="color: #94a3b8;">
+            Select any Object, Field FLS, System Permission, Apex Class, or Flow to immediately discover all users with access and trace their exact Profile, Permission Set, or Group origins.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Configuration Card -->
+    <div class="slds-p-around_medium">
+      <div class="filter-card">
+        <!-- 1. Category Tabs/Pills -->
+        <div class="slds-m-bottom_medium">
+          <label class="slds-form-element__label slds-text-title_bold slds-text-color_weak slds-m-bottom_x-small" style="display: block;">
+            1. Select Permission Category
+          </label>
+          <div class="slds-grid slds-wrap" style="gap: 0.5rem;">
+            <div
+              class={objectPillClass}
+              data-category="OBJECT"
+              onclick={handleSelectCategory}
+            >
+              <lightning-icon icon-name="utility:database" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              Object Permissions
+            </div>
+            <div
+              class={fieldPillClass}
+              data-category="FIELD"
+              onclick={handleSelectCategory}
+            >
+              <lightning-icon icon-name="utility:table" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              Field Permissions (FLS)
+            </div>
+            <div
+              class={systemPillClass}
+              data-category="SYSTEM"
+              onclick={handleSelectCategory}
+            >
+              <lightning-icon icon-name="utility:settings" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              System Permissions
+            </div>
+            <div
+              class={apexPillClass}
+              data-category="APEX"
+              onclick={handleSelectCategory}
+            >
+              <lightning-icon icon-name="utility:apex" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              Apex Classes
+            </div>
+            <div
+              class={flowPillClass}
+              data-category="FLOW"
+              onclick={handleSelectCategory}
+            >
+              <lightning-icon icon-name="utility:flow" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              Flows
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Dynamic Target Controls -->
+        <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-m-bottom_small">
+          <!-- Object Controls -->
+          <template lwc:if={isObjectCategory}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+              <lightning-combobox
+                label="Target Object"
+                value={selectedSObject}
+                options={sObjectOptions}
+                placeholder="Choose Object..."
+                onchange={handleObjectChange}
+              ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+              <lightning-combobox
+                label="Permission Level"
+                value={selectedAccessType}
+                options={objectAccessOptions}
+                onchange={handleAccessTypeChange}
+              ></lightning-combobox>
+            </div>
+          </template>
+
+          <!-- Field Controls -->
+          <template lwc:if={isFieldCategory}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+              <lightning-combobox
+                label="sObject"
+                value={selectedFieldSObject}
+                options={sObjectOptions}
+                placeholder="Choose Object..."
+                onchange={handleFieldObjectChange}
+              ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+              <lightning-combobox
+                label="Target Field"
+                value={selectedField}
+                options={fieldOptions}
+                placeholder="Select Field..."
+                onchange={handleFieldChange}
+              ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+              <lightning-combobox
+                label="Field Access Level"
+                value={selectedFieldAccessType}
+                options={fieldAccessOptions}
+                onchange={handleFieldAccessTypeChange}
+              ></lightning-combobox>
+            </div>
+          </template>
+
+          <!-- System Permission Controls -->
+          <template lwc:if={isSystemCategory}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12">
+              <lightning-combobox
+                label="Select System Permission"
+                value={selectedSystemPerm}
+                options={systemPermOptions}
+                placeholder="Choose System Permission..."
+                onchange={handleSystemPermChange}
+              ></lightning-combobox>
+            </div>
+          </template>
+
+          <!-- Apex Class Controls -->
+          <template lwc:if={isApexCategory}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12 slds-is-relative">
+              <lightning-input
+                label="Search Apex Class"
+                type="search"
+                value={apexSearchTerm}
+                placeholder="Type class name..."
+                oninput={handleApexSearchInput}
+                onfocus={handleApexFocus}
+                onblur={handleApexBlur}
+              ></lightning-input>
+
+              <template lwc:if={showApexDropdown}>
+                <div class="dropdown-results">
+                  <template for:each={apexSearchResults} for:item="cls">
+                    <div
+                      key={cls.value}
+                      class="dropdown-item slds-grid slds-grid_vertical-align-center"
+                      data-name={cls.value}
+                      onmousedown={handleSelectApexClass}
+                    >
+                      <lightning-icon icon-name="utility:apex" size="x-small" class="slds-m-right_small"></lightning-icon>
+                      <span>{cls.label}</span>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <!-- Flow Controls -->
+          <template lwc:if={isFlowCategory}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_12-of-12 slds-is-relative">
+              <lightning-input
+                label="Search Flow"
+                type="search"
+                value={flowSearchTerm}
+                placeholder="Type flow API name or label..."
+                oninput={handleFlowSearchInput}
+                onfocus={handleFlowFocus}
+                onblur={handleFlowBlur}
+              ></lightning-input>
+
+              <template lwc:if={showFlowDropdown}>
+                <div class="dropdown-results">
+                  <template for:each={flowSearchResults} for:item="flw">
+                    <div
+                      key={flw.value}
+                      class="dropdown-item slds-grid slds-grid_vertical-align-center"
+                      data-name={flw.value}
+                      onmousedown={handleSelectFlow}
+                    >
+                      <lightning-icon icon-name="utility:flow" size="x-small" class="slds-m-right_small"></lightning-icon>
+                      <span>{flw.label}</span>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+
+        <!-- 3. Toolbar & Options -->
+        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_medium slds-p-top_small slds-border_top">
+          <div class="slds-form-element">
+            <lightning-input
+              type="checkbox"
+              label="Active Users Only"
+              checked={activeUsersOnly}
+              onchange={handleActiveUsersToggle}
+            ></lightning-input>
+          </div>
+
+          <div class="slds-button-group" role="group">
+            <lightning-button
+              label="Export to CSV"
+              icon-name="utility:download"
+              variant="neutral"
+              onclick={handleExportCsv}
+              disabled={isExportDisabled}
+            ></lightning-button>
+            <lightning-button
+              label="Search Access"
+              icon-name="utility:search"
+              variant="brand"
+              onclick={handleSearchAccess}
+            ></lightning-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spinner -->
+    <template lwc:if={isLoading}>
+      <div class="slds-p-around_xx-large slds-is-relative" style="height: 200px;">
+        <lightning-spinner alternative-text="Auditing user access..." size="medium"></lightning-spinner>
+      </div>
+    </template>
+
+    <!-- Results Section -->
+    <template lwc:if={hasResults}>
+      <div class="slds-p-around_medium slds-border_top">
+        <!-- Metrics Strip -->
+        <div class="metrics-strip">
+          <div class="metric-item">
+            <lightning-icon icon-name="utility:user" size="small" variant="success"></lightning-icon>
+            <div>
+              <div class="metric-label">Users with Access</div>
+              <div class="metric-value">{auditResults.totalUsersCount}</div>
+            </div>
+          </div>
+          <div class="metric-item slds-m-left_medium">
+            <lightning-icon icon-name="utility:check" size="small" variant="success"></lightning-icon>
+            <div>
+              <div class="metric-label">Active Users</div>
+              <div class="metric-value">{auditResults.activeUsersCount}</div>
+            </div>
+          </div>
+          <div class="metric-item slds-m-left_medium">
+            <lightning-icon icon-name="utility:groups" size="small"></lightning-icon>
+            <div>
+              <div class="metric-label">Granting Profiles</div>
+              <div class="metric-value">{auditResults.profilesCount}</div>
+            </div>
+          </div>
+          <div class="metric-item slds-m-left_medium">
+            <lightning-icon icon-name="utility:custom_apps" size="small"></lightning-icon>
+            <div>
+              <div class="metric-label">Granting Permission Sets</div>
+              <div class="metric-value">{auditResults.permissionSetsCount}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar inside Results -->
+        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small">
+          <div class="slds-text-heading_small font-weight-700">
+            Effective User Access ({displayedUsersCount} matched)
+          </div>
+          <div style="width: 320px;">
+            <lightning-input
+              type="search"
+              variant="label-hidden"
+              placeholder="Filter by user name, profile, dept..."
+              oninput={handleTableFilter}
+            ></lightning-input>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 6px;">
+          <table class="custom-table slds-table_bordered">
+            <thead>
+              <tr>
+                <th style="min-width: 170px;">User</th>
+                <th style="min-width: 140px;">Profile</th>
+                <th style="width: 90px; text-align: center;">Status</th>
+                <th style="min-width: 140px;">Role / Dept</th>
+                <th style="min-width: 250px;">Grant Sources (How User Got Access)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={displayedUsers} for:item="u">
+                <tr key={u.key}>
+                  <!-- User Name -->
+                  <td>
+                    <div class="font-weight-600 slds-truncate" title={u.name}>{u.name}</div>
+                    <div class="slds-text-body_extra-small slds-text-color_weak slds-truncate" title={u.username}>
+                      {u.username}
+                    </div>
+                  </td>
+                  <!-- Profile -->
+                  <td>
+                    <span class="slds-truncate" title={u.profileName}>{u.profileName}</span>
+                  </td>
+                  <!-- Status -->
+                  <td style="text-align: center;">
+                    <span class={u.statusBadgeClass}>{u.statusLabel}</span>
+                  </td>
+                  <!-- Role & Department -->
+                  <td>
+                    <div class="slds-truncate" title={u.userRole}>{u.userRole}</div>
+                    <div class="slds-text-body_extra-small slds-text-color_weak slds-truncate" title={u.department}>
+                      {u.department}
+                    </div>
+                  </td>
+                  <!-- Grant Sources -->
+                  <td>
+                    <div class="slds-grid slds-wrap">
+                      <template for:each={u.sources} for:item="src">
+                        <span
+                          key={src.key}
+                          class={src.badgeClass}
+                          title={src.reason}
+                        >
+                          {src.sourceType}: {src.sourceName}
+                        </span>
+                      </template>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <!-- No Results State -->
+    <template lwc:if={hasNoResults}>
+      <div class="slds-p-around_large slds-text-align_center slds-text-color_weak slds-border_top">
+        <lightning-icon icon-name="utility:info" size="medium" class="slds-m-bottom_small"></lightning-icon>
+        <p class="slds-text-heading_small">No users found with this permission.</p>
+        <p class="slds-text-body_small">Try unchecking "Active Users Only" or selecting a different permission level.</p>
+      </div>
+    </template>
+  </div>
+</template>
