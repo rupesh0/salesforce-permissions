@@ -77,6 +77,18 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>DescribeCacheService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ProfileMigrationController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>SetupAuditTrailController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>StandardInvocableActionAccessController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -108,6 +120,10 @@
     </tabSettings>
     <tabSettings>
         <tab>Permission_Comparator</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Profile_Migration</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

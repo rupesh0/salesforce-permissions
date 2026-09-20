@@ -1,0 +1,655 @@
+<template>
+  <div class="migration-container">
+    <!-- Loading Spinner -->
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Processing Migration Request"
+        size="large"
+        variant="brand"
+      ></lightning-spinner>
+    </template>
+
+    <!-- Executive Hero Banner -->
+    <div class="hero-card">
+      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+        <div class="hero-content">
+          <div class="slds-m-bottom_xx-small">
+            <span class="hero-badge">Phase 5 Enterprise Migration</span>
+          </div>
+          <h1 class="hero-title">
+            <lightning-icon
+              icon-name="standard:flow"
+              size="medium"
+              variant="inverse"
+              class="slds-m-right_x-small"
+            ></lightning-icon>
+            Profile Unbundler &amp; EOL Transition Engine
+          </h1>
+          <p class="hero-subtitle">
+            Automated migration tooling for Salesforce's Profile Permissions Retirement roadmap.
+            Deconstruct monolithic legacy profiles into modular, reusable Permission Sets or
+            Permission Set Groups with pre-flight simulation and 1-click rollback.
+          </p>
+        </div>
+        <div>
+          <lightning-button-group>
+            <lightning-button
+              label="Export Breakdown (CSV)"
+              icon-name="utility:download"
+              onclick={handleExportCSV}
+              disabled={isExportDisabled}
+            ></lightning-button>
+            <lightning-button
+              label="Refresh"
+              icon-name="utility:refresh"
+              onclick={handleAnalyzeProfile}
+              disabled={isRefreshDisabled}
+            ></lightning-button>
+          </lightning-button-group>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wizard Progress Indicator -->
+    <div class="stepper-card">
+      <lightning-progress-indicator
+        current-step={currentStep}
+        type="path"
+        variant="base"
+      >
+        <lightning-progress-step
+          label="1. Deconstruct Profile"
+          value="deconstruct"
+        ></lightning-progress-step>
+        <lightning-progress-step
+          label="2. Configure &amp; Generate"
+          value="generate"
+        ></lightning-progress-step>
+        <lightning-progress-step
+          label="3. Pre-Flight &amp; Migrate Users"
+          value="migrate"
+        ></lightning-progress-step>
+      </lightning-progress-indicator>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- STEP 1: DECONSTRUCT PROFILE                          -->
+    <!-- ==================================================== -->
+    <template lwc:if={isStepDeconstruct}>
+      <!-- Profile Selector Bar -->
+      <div class="main-card slds-m-bottom_medium">
+        <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <lightning-combobox
+              name="profileSelect"
+              label="Select Source Profile to Deconstruct"
+              placeholder="Search or choose a profile..."
+              value={selectedProfileId}
+              options={profileOptions}
+              onchange={handleProfileChange}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-text-align_right slds-m-top_small">
+            <template lwc:if={analysisData}>
+              <lightning-button
+                variant="brand"
+                label="Proceed to Permission Set Generator"
+                icon-name="utility:forward"
+                icon-position="right"
+                onclick={handleProceedToGenerator}
+              ></lightning-button>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <template lwc:if={analysisData}>
+        <!-- Capability KPI Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper icon-objects">
+              <lightning-icon icon-name="standard:data_streams" size="small"></lightning-icon>
+            </div>
+            <div>
+              <div class="kpi-value">{analysisData.totalObjects}</div>
+              <div class="kpi-label">Objects With CRUD</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper icon-fields">
+              <lightning-icon icon-name="standard:field" size="small"></lightning-icon>
+            </div>
+            <div>
+              <div class="kpi-value">{analysisData.totalFields}</div>
+              <div class="kpi-label">Field Permissions</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper icon-system">
+              <lightning-icon icon-name="standard:system_and_global_variable" size="small"></lightning-icon>
+            </div>
+            <div>
+              <div class="kpi-value">{analysisData.totalSystemPerms}</div>
+              <div class="kpi-label">System Permissions</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper icon-apex">
+              <lightning-icon icon-name="standard:apex" size="small"></lightning-icon>
+            </div>
+            <div>
+              <div class="kpi-value">{analysisData.totalApexClasses}</div>
+              <div class="kpi-label">Apex Classes</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper icon-users">
+              <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+            </div>
+            <div>
+              <div class="kpi-value">{analysisData.assignedActiveUsers}</div>
+              <div class="kpi-label">Active Profile Users</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capability Tabs & Granular Inspector -->
+        <div class="main-card">
+          <lightning-tabset variant="scoped" active-tab-value={activeTab}>
+            <!-- Tab: Objects -->
+            <lightning-tab label="Objects &amp; CRUD" value="OBJECTS" onactive={handleTabSelect}>
+              <div class="table-filter-bar">
+                <div class="slds-form-element">
+                  <lightning-input
+                    type="search"
+                    placeholder="Search objects..."
+                    variant="label-hidden"
+                    class="table-search-input"
+                    onchange={handleObjectSearch}
+                  ></lightning-input>
+                </div>
+                <div>
+                  <lightning-input
+                    type="checkbox"
+                    label="Select All for Migration"
+                    checked={selectAllObjects}
+                    onchange={handleToggleAllObjects}
+                  ></lightning-input>
+                </div>
+              </div>
+
+              <div class="slds-scrollable_y" style="max-height: 420px;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                  <thead>
+                    <tr class="slds-line-height_reset">
+                      <th style="width: 48px;">Include</th>
+                      <th>Object Name</th>
+                      <th>Permissions Granted</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={filteredObjectPermissions} for:item="op">
+                      <tr key={op.objectName}>
+                        <td>
+                          <lightning-input
+                            type="checkbox"
+                            variant="label-hidden"
+                            data-object={op.objectName}
+                            checked={op.isSelected}
+                            onchange={handleObjectCheckboxChange}
+                          ></lightning-input>
+                        </td>
+                        <td>
+                          <span class="slds-text-heading_small slds-text-title_bold">{op.objectName}</span>
+                        </td>
+                        <td>
+                          <template lwc:if={op.permissionsRead}>
+                            <span class="badge-pill badge-read">Read</span>
+                          </template>
+                          <template lwc:if={op.permissionsCreate}>
+                            <span class="badge-pill badge-create">Create</span>
+                          </template>
+                          <template lwc:if={op.permissionsEdit}>
+                            <span class="badge-pill badge-edit">Edit</span>
+                          </template>
+                          <template lwc:if={op.permissionsDelete}>
+                            <span class="badge-pill badge-delete">Delete</span>
+                          </template>
+                          <template lwc:if={op.permissionsViewAllRecords}>
+                            <span class="badge-pill badge-viewall">View All</span>
+                          </template>
+                          <template lwc:if={op.permissionsModifyAllRecords}>
+                            <span class="badge-pill badge-modifyall">Modify All</span>
+                          </template>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </lightning-tab>
+
+            <!-- Tab: Fields -->
+            <lightning-tab label="Field Permissions (FLS)" value="FIELDS" onactive={handleTabSelect}>
+              <div class="table-filter-bar">
+                <lightning-input
+                  type="search"
+                  placeholder="Search fields or objects..."
+                  variant="label-hidden"
+                  class="table-search-input"
+                  onchange={handleFieldSearch}
+                ></lightning-input>
+                <div class="slds-text-color_weak slds-text-body_small">
+                  Showing {filteredFieldPermissions.length} fields
+                </div>
+              </div>
+
+              <div class="slds-scrollable_y" style="max-height: 420px;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                  <thead>
+                    <tr class="slds-line-height_reset">
+                      <th>Object</th>
+                      <th>Field API Name</th>
+                      <th>Access Level</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={filteredFieldPermissions} for:item="fp">
+                      <tr key={fp.fieldName}>
+                        <td class="slds-text-title_bold">{fp.objectName}</td>
+                        <td><code>{fp.fieldName}</code></td>
+                        <td>
+                          <template lwc:if={fp.permissionsRead}>
+                            <span class="badge-pill badge-read">Read</span>
+                          </template>
+                          <template lwc:if={fp.permissionsEdit}>
+                            <span class="badge-pill badge-edit">Edit</span>
+                          </template>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </lightning-tab>
+
+            <!-- Tab: System Permissions -->
+            <lightning-tab label="System Permissions" value="SYSTEM" onactive={handleTabSelect}>
+              <div class="table-filter-bar">
+                <lightning-input
+                  type="search"
+                  placeholder="Search system permissions..."
+                  variant="label-hidden"
+                  class="table-search-input"
+                  onchange={handleSystemSearch}
+                ></lightning-input>
+                <div class="slds-text-color_weak slds-text-body_small">
+                  {filteredSystemPermissions.length} active system permissions
+                </div>
+              </div>
+
+              <div class="slds-scrollable_y" style="max-height: 420px;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                  <thead>
+                    <tr class="slds-line-height_reset">
+                      <th>Permission Label</th>
+                      <th>API Field Name</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={filteredSystemPermissions} for:item="sp">
+                      <tr key={sp.apiName}>
+                        <td class="slds-text-title_bold">{sp.label}</td>
+                        <td><code>{sp.apiName}</code></td>
+                        <td>
+                          <span class="badge-pill badge-create">Enabled</span>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </lightning-tab>
+
+            <!-- Tab: Apex Classes -->
+            <lightning-tab label="Apex Classes" value="APEX" onactive={handleTabSelect}>
+              <div class="table-filter-bar">
+                <lightning-input
+                  type="search"
+                  placeholder="Search Apex classes..."
+                  variant="label-hidden"
+                  class="table-search-input"
+                  onchange={handleApexSearch}
+                ></lightning-input>
+                <div class="slds-text-color_weak slds-text-body_small">
+                  {filteredApexClassPermissions.length} authorized Apex classes
+                </div>
+              </div>
+
+              <div class="slds-scrollable_y" style="max-height: 420px;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                  <thead>
+                    <tr class="slds-line-height_reset">
+                      <th>Class Name</th>
+                      <th>Class ID</th>
+                      <th>Execution Access</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={filteredApexClassPermissions} for:item="ac">
+                      <tr key={ac.classId}>
+                        <td class="slds-text-title_bold">{ac.className}</td>
+                        <td><code>{ac.classId}</code></td>
+                        <td>
+                          <span class="badge-pill badge-create">Enabled</span>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </lightning-tab>
+          </lightning-tabset>
+        </div>
+      </template>
+    </template>
+
+    <!-- ==================================================== -->
+    <!-- STEP 2: CONFIGURE & GENERATE                         -->
+    <!-- ==================================================== -->
+    <template lwc:if={isStepGenerate}>
+      <div class="main-card">
+        <div class="section-header">
+          <div class="section-title">
+            <lightning-icon icon-name="standard:settings" size="small"></lightning-icon>
+            Configure Target Permission Artifact
+          </div>
+          <lightning-button
+            label="Back to Deconstruction"
+            icon-name="utility:back"
+            onclick={handleBackToDeconstruct}
+          ></lightning-button>
+        </div>
+
+        <!-- Target Type Mode Selection Cards -->
+        <div class="slds-grid slds-gutters slds-m-bottom_large">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <div
+              class={modePsClass}
+              data-type="PERMISSION_SET"
+              onclick={handleTargetTypeSelect}
+            >
+              <div class="mode-title">
+                <lightning-icon icon-name="standard:record" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                Custom Permission Set
+              </div>
+              <p class="mode-desc">
+                Creates a standalone modular Permission Set containing the selected capabilities.
+                Ideal for granular access unbundling.
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <div
+              class={modePsgClass}
+              data-type="PERMISSION_SET_GROUP"
+              onclick={handleTargetTypeSelect}
+            >
+              <div class="mode-title">
+                <lightning-icon icon-name="standard:hierarchy" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                Permission Set + Permission Set Group (PSG) Bundle
+              </div>
+              <p class="mode-desc">
+                Creates both the Permission Set and a bundled Permission Set Group, pre-linked
+                via component hierarchy for instant user assignment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metadata Form -->
+        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <lightning-input
+              type="text"
+              label="Target Permission Set Label"
+              value={targetLabel}
+              required
+              onchange={handleLabelChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <lightning-input
+              type="text"
+              label="Target API Developer Name"
+              value={targetName}
+              required
+              onchange={handleNameChange}
+            ></lightning-input>
+          </div>
+        </div>
+
+        <div class="slds-m-bottom_large">
+          <lightning-textarea
+            label="Description"
+            value={targetDescription}
+            onchange={handleDescChange}
+          ></lightning-textarea>
+        </div>
+
+        <!-- Category Inclusion Toggle Pills -->
+        <div class="slds-m-bottom_large">
+          <div class="slds-text-title_caps slds-m-bottom_small" style="font-weight: 700;">
+            Select Capabilities to Include:
+          </div>
+          <div class="slds-grid slds-wrap" style="gap: 0.75rem;">
+            <div
+              class={pillObjectClass}
+              data-category="OBJECT"
+              onclick={handleToggleCategory}
+            >
+              <lightning-icon icon-name="utility:check" size="x-small" variant={pillObjectVariant}></lightning-icon>
+              <span>Object Permissions &amp; CRUD</span>
+            </div>
+            <div
+              class={pillFieldClass}
+              data-category="FIELD"
+              onclick={handleToggleCategory}
+            >
+              <lightning-icon icon-name="utility:check" size="x-small" variant={pillFieldVariant}></lightning-icon>
+              <span>Field Permissions (FLS)</span>
+            </div>
+            <div
+              class={pillSystemClass}
+              data-category="SYSTEM"
+              onclick={handleToggleCategory}
+            >
+              <lightning-icon icon-name="utility:check" size="x-small" variant={pillSystemVariant}></lightning-icon>
+              <span>System Permissions</span>
+            </div>
+            <div
+              class={pillApexClass}
+              data-category="APEX"
+              onclick={handleToggleCategory}
+            >
+              <lightning-icon icon-name="utility:check" size="x-small" variant={pillApexVariant}></lightning-icon>
+              <span>Apex Classes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <div>
+            <span class="slds-text-color_weak slds-text-body_small">
+              Source Profile: <strong>{selectedProfileName}</strong>
+            </span>
+          </div>
+          <lightning-button
+            variant="brand"
+            label="Generate Permission Set Now"
+            icon-name="utility:magicwand"
+            onclick={handleExecuteGeneration}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <!-- ==================================================== -->
+    <!-- STEP 3: PRE-FLIGHT & MIGRATE USERS                   -->
+    <!-- ==================================================== -->
+    <template lwc:if={isStepMigrate}>
+      <template lwc:if={migrationResult}>
+        <!-- Generation Success Banner -->
+        <div class="success-card">
+          <div class="success-title">
+            <lightning-icon icon-name="utility:success" size="small" variant="inverse"></lightning-icon>
+            Permission Artifact Created Successfully!
+          </div>
+          <div class="success-message">
+            {migrationResult.message}
+          </div>
+          <template lwc:if={hasWarnings}>
+            <div class="slds-m-top_small slds-p-around_small" style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
+              <div class="slds-text-title_bold slds-text-color_warning slds-m-bottom_xx-small">
+                Dependency Notices:
+              </div>
+              <template for:each={migrationResult.warnings} for:item="w">
+                <p key={w} class="slds-text-body_small slds-text-color_weak">• {w}</p>
+              </template>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <!-- Pre-Flight Dry Run Simulation Banner -->
+      <template lwc:if={userPreview}>
+        <div class="preflight-banner">
+          <div class="preflight-stat">
+            <div class="preflight-stat-num">{userPreview.toAssignCount}</div>
+            <div class="preflight-stat-label">Ready to Assign</div>
+          </div>
+          <div class="preflight-stat">
+            <div class="preflight-stat-num" style="color: #3730a3;">{userPreview.alreadyAssignedCount}</div>
+            <div class="preflight-stat-label" style="color: #4338ca;">Already Assigned</div>
+          </div>
+          <div class="preflight-stat">
+            <div class="preflight-stat-num" style="color: #64748b;">{userPreview.inactiveCount}</div>
+            <div class="preflight-stat-label" style="color: #475569;">Inactive (Skipped)</div>
+          </div>
+          <div class="preflight-stat">
+            <div class="preflight-stat-num" style="color: #0f172a;">{userPreview.totalUsers}</div>
+            <div class="preflight-stat-label">Total Profile Users</div>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="main-card">
+          <div class="section-header">
+            <div class="section-title">
+              <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+              Select Users for Zero-Downtime Migration
+            </div>
+            <div class="slds-grid slds-grid_vertical-align-center" style="gap: 0.5rem;">
+              <lightning-button
+                label="Back to Generator"
+                icon-name="utility:back"
+                onclick={handleProceedToGenerator}
+              ></lightning-button>
+              <lightning-button
+                variant="brand"
+                label={executeButtonLabel}
+                icon-name="utility:adduser"
+                onclick={handleExecuteUserMigration}
+                disabled={isExecuteDisabled}
+              ></lightning-button>
+            </div>
+          </div>
+
+          <div class="table-filter-bar">
+            <lightning-input
+              type="search"
+              placeholder="Search users..."
+              variant="label-hidden"
+              class="table-search-input"
+              onchange={handleUserSearch}
+            ></lightning-input>
+            <div>
+              <lightning-input
+                type="checkbox"
+                label="Select All Ready Users"
+                checked={selectAllUsers}
+                onchange={handleToggleSelectAllUsers}
+              ></lightning-input>
+            </div>
+          </div>
+
+          <div class="slds-scrollable_y" style="max-height: 400px;">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th style="width: 48px;">Assign</th>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={filteredUsers} for:item="u">
+                  <tr key={u.userId}>
+                    <td>
+                      <lightning-input
+                        type="checkbox"
+                        variant="label-hidden"
+                        data-id={u.userId}
+                        checked={u.isChecked}
+                        disabled={u.isNotSelectable}
+                        onchange={handleUserCheckboxChange}
+                      ></lightning-input>
+                    </td>
+                    <td>
+                      <span class="slds-text-title_bold">{u.name}</span>
+                    </td>
+                    <td><code>{u.username}</code></td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span class={u.badgeClass}>{u.badgeText}</span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Execution Summary and Rollback Protection -->
+          <template lwc:if={hasCreatedAssignments}>
+            <div class="slds-m-top_large slds-p-around_medium" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+              <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                <div>
+                  <div class="slds-text-title_bold slds-text-color_success">
+                    <lightning-icon icon-name="utility:check" size="x-small" variant="success" class="slds-m-right_xx-small"></lightning-icon>
+                    {executionResult.createdAssignmentIds.length} User Assignments Created
+                  </div>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                    Target users now hold the newly migrated Permission Set without any disruption to their daily access.
+                  </p>
+                </div>
+                <div>
+                  <lightning-button
+                    variant="destructive-text"
+                    label="Emergency Rollback Assignments"
+                    icon-name="utility:undo"
+                    onclick={handleRollbackAssignments}
+                    is-loading={isRollbackLoading}
+                  ></lightning-button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </template>
+  </div>
+</template>

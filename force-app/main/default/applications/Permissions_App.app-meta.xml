@@ -20,5 +20,6 @@
     <tabs>Who_Has_Access</tabs>
     <tabs>Security_Advisor</tabs>
     <tabs>Permission_Comparator</tabs>
+    <tabs>Profile_Migration</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

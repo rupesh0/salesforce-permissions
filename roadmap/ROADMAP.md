@@ -13,8 +13,8 @@ graph TD
     P1["Phase 1: Security Auditing & Export Engine (Completed)"] --> P2["Phase 2: Risk Scanner & Governance Advisor (Completed)"]
     P2 --> P3["Phase 3: Permission Set / Profile Comparator & PSG Muting (Completed)"]
     P3 --> P4["Phase 4: In-App Remediation & Performance Optimization (Completed)"]
-    P4 --> P5["Phase 5: Profile-to-PermissionSet Migration Engine (Next)"]
-    P5 --> P6["Phase 6: Executive Command Center & Global Search"]
+    P4 --> P5["Phase 5: Profile-to-PermissionSet Migration Engine (Completed)"]
+    P5 --> P6["Phase 6: Executive Command Center & Global Search (Next)"]
     P6 --> P7["Phase 7: Autonomous Governance & Continuous Monitoring"]
     P7 --> P8["Phase 8: Enterprise Packaging & Compliance Dossier Generator"]
 
@@ -22,8 +22,8 @@ graph TD
     style P2 fill:#dcfce7,stroke:#16a34a,stroke-width:2px
     style P3 fill:#dcfce7,stroke:#16a34a,stroke-width:2px
     style P4 fill:#dcfce7,stroke:#16a34a,stroke-width:2px
-    style P5 fill:#e0e7ff,stroke:#4338ca,stroke-width:3px
-    style P6 fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style P5 fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style P6 fill:#e0e7ff,stroke:#4338ca,stroke-width:3px
     style P7 fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
     style P8 fill:#f1f5f9,stroke:#475569,stroke-width:2px
 ```
@@ -108,7 +108,13 @@ graph TD
 
 ---
 
-## Phase 5: Profile-to-PermissionSet Migration Engine ("Profile Unbundler & EOL Transition") [NEXT]
+## Phase 5: Profile-to-PermissionSet Migration Engine ("Profile Unbundler & EOL Transition") [COMPLETED]
+
+### Status: Complete & Deployed
+
+- **Apex**: `ProfileMigrationController.cls`, `ProfileMigrationControllerTest.cls` (10/10 tests pass, 86% coverage)
+- **LWC**: `c/profileMigration` (3-step wizard, capability breakdown, generator, pre-flight simulator, rollback)
+- **Metadata**: Custom Tab `Profile_Migration`, FlexiPage `Profile_Migration`, `Permissions_App`
 
 ### Objectives
 
