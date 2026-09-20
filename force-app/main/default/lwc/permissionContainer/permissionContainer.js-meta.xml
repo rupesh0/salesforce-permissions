@@ -22,6 +22,19 @@
         datasource="objects,apexClass,vfPage,customSettings,customMetadata,externalDataSources,flow,namedCredentials,assignedApps,assignedConnectedApps,appPermissions,systemPermissions,orgWideEmail,standardInvocableActions,serviceProviders"
       />
             <property name="title" type="String" label="Custom Page Title" />
+            <property
+        name="searchPlaceholder"
+        type="String"
+        label="Search Input Placeholder"
+        description="Placeholder text displayed in the search input box."
+      />
+            <property
+        name="storageKeyPrefix"
+        type="String"
+        default="permission_filters"
+        label="Storage Key Prefix"
+        description="Prefix used for saving filter preferences in localStorage."
+      />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

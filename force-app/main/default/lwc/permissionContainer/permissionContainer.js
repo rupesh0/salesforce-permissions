@@ -1,6 +1,7 @@
 import { api, LightningElement, track } from "lwc";
 import Toast from "lightning/toast";
 import { makeFilters, reduceErrors } from "c/utils";
+import getCurrentUsersDetails from "@salesforce/apex/MyPermissionsController.getCurrentUsersDetails";
 import { PERMISSION_TYPES, DEFAULT_TITLES } from "./constants";
 import { LABELS } from "./i18n";
 
@@ -8,6 +9,7 @@ export default class PermissionContainer extends LightningElement {
   @api permissionType = PERMISSION_TYPES.OBJECTS;
   @api title;
   @api storageKeyPrefix = "permission_filters";
+  @api searchPlaceholder;
 
   @api
   get defaultFilters() {
@@ -36,12 +38,33 @@ export default class PermissionContainer extends LightningElement {
   error;
   isLoading = false;
 
-  connectedCallback() {
+  async connectedCallback() {
     this.filterController.loadFromLocalStorage();
     if (this._defaultFilters) {
       this.filterController.setDefaults(this._defaultFilters);
+    } else if (
+      (!this.filterController.currentFilters.profileIds ||
+        this.filterController.currentFilters.profileIds.length === 0) &&
+      (!this.filterController.currentFilters.permissionSetIds ||
+        this.filterController.currentFilters.permissionSetIds.length === 0)
+    ) {
+      try {
+        const userDetails = await getCurrentUsersDetails();
+        if (userDetails && userDetails.currentUsersProfileId) {
+          const defaults = {
+            profileIds: [userDetails.currentUsersProfileId],
+            permissionSetIds: userDetails.currentUsersPermissionSetIds || []
+          };
+          this.filterController.setDefaults(defaults);
+        }
+      } catch (ex) {
+        // Silently fallback if unable to fetch current user
+      }
     }
     this.appliedFilters = this.filterController.currentFilters;
+    if (this.refs.toolbar) {
+      this.refs.toolbar.filterValues = this.filterController.currentFilters;
+    }
   }
 
   handleApplyFilter(event) {

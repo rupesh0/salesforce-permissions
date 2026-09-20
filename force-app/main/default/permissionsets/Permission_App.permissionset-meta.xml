@@ -87,6 +87,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
+        <tab>Dashboard</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>My_Permissions</tab>
         <visibility>Visible</visibility>
     </tabSettings>
