@@ -11,11 +11,15 @@
           ></lightning-icon>
         </div>
         <div class="slds-col">
-          <h1 class="slds-text-heading_medium slds-text-color_default" style="font-weight: 700;">
+          <h1
+            class="slds-text-heading_medium slds-text-color_default"
+            style="font-weight: 700"
+          >
             Record Access & Sharing Inspector
           </h1>
           <p class="slds-text-body_small slds-text-color_weak">
-            Select an sObject, pick records, choose target users, and analyze Read/Edit permissions alongside detailed sharing explanations.
+            Select an sObject, pick records, choose target users, and analyze
+            Read/Edit permissions alongside detailed sharing explanations.
           </p>
         </div>
       </div>
@@ -25,9 +29,13 @@
     <div class="slds-p-around_medium">
       <div class="slds-grid slds-gutters slds-wrap">
         <!-- Step 1: sObject Selector -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small">
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small"
+        >
           <div class="selection-box">
-            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+            <div
+              class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small"
+            >
               <lightning-icon
                 icon-name="utility:database"
                 size="x-small"
@@ -45,16 +53,23 @@
               onchange={handleSObjectChange}
               disabled={isSObjectsLoading}
             ></lightning-combobox>
-            <div class="slds-m-top_xx-small slds-text-color_weak slds-text-body_extra-small">
-              Currently inspecting: <strong>{selectedSObjectLabel}</strong> ({selectedSObject})
+            <div
+              class="slds-m-top_xx-small slds-text-color_weak slds-text-body_extra-small"
+            >
+              Currently inspecting:
+              <strong>{selectedSObjectLabel}</strong> ({selectedSObject})
             </div>
           </div>
         </div>
 
         <!-- Step 2: Record Selector -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small">
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small"
+        >
           <div class="selection-box">
-            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small">
+            <div
+              class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small"
+            >
               <div class="slds-grid slds-grid_vertical-align-center">
                 <lightning-icon
                   icon-name="utility:record"
@@ -64,7 +79,9 @@
                 <span class="section-title">2. Select Records</span>
               </div>
               <template lwc:if={hasSelectedRecords}>
-                <span class="slds-badge slds-theme_info">{selectedRecordsCount} selected</span>
+                <span class="slds-badge slds-theme_info"
+                  >{selectedRecordsCount} selected</span
+                >
               </template>
             </div>
 
@@ -97,18 +114,25 @@
                           class="slds-m-right_small"
                         ></lightning-icon>
                         <div class="slds-col slds-truncate">
-                          <div class="slds-text-body_regular slds-truncate font-weight-600">
+                          <div
+                            class="slds-text-body_regular slds-truncate font-weight-600"
+                          >
                             {rec.name}
                           </div>
-                          <div class="slds-text-body_extra-small slds-text-color_weak">
-                            {rec.sObjectLabel} &bull; <span class="mono-font">{rec.id}</span>
+                          <div
+                            class="slds-text-body_extra-small slds-text-color_weak"
+                          >
+                            {rec.sObjectLabel} &bull;
+                            <span class="mono-font">{rec.id}</span>
                           </div>
                         </div>
                       </div>
                     </template>
                   </template>
                   <template lwc:else>
-                    <div class="slds-p-around_small slds-text-color_weak slds-text-align_center">
+                    <div
+                      class="slds-p-around_small slds-text-color_weak slds-text-align_center"
+                    >
                       No records found for "{recordSearchTerm}"
                     </div>
                   </template>
@@ -119,8 +143,12 @@
             <!-- Selected Records Pills Container -->
             <div class="slds-m-top_small">
               <template lwc:if={hasSelectedRecords}>
-                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
-                  <span class="slds-text-title_bold slds-text-color_weak">Selected:</span>
+                <div
+                  class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small"
+                >
+                  <span class="slds-text-title_bold slds-text-color_weak"
+                    >Selected:</span
+                  >
                   <button
                     class="slds-button slds-text-color_error slds-text-body_extra-small"
                     onclick={handleClearAllRecords}
@@ -135,7 +163,11 @@
                         icon-name="standard:record"
                         size="xx-small"
                       ></lightning-icon>
-                      <span class="slds-truncate" style="max-width: 140px;" title={rec.name}>
+                      <span
+                        class="slds-truncate"
+                        style="max-width: 140px"
+                        title={rec.name}
+                      >
                         {rec.name}
                       </span>
                       <lightning-button-icon
@@ -151,7 +183,9 @@
                 </div>
               </template>
               <template lwc:else>
-                <div class="slds-text-body_extra-small slds-text-color_weak slds-p-around_x-small slds-text-align_center slds-border_dashed">
+                <div
+                  class="slds-text-body_extra-small slds-text-color_weak slds-p-around_x-small slds-text-align_center slds-border_dashed"
+                >
                   Search & click to add records (multi-select supported)
                 </div>
               </template>
@@ -160,9 +194,13 @@
         </div>
 
         <!-- Step 3: User Selector -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small">
+        <div
+          class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small"
+        >
           <div class="selection-box">
-            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small">
+            <div
+              class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-bottom_x-small"
+            >
               <div class="slds-grid slds-grid_vertical-align-center">
                 <lightning-icon
                   icon-name="utility:people"
@@ -172,7 +210,9 @@
                 <span class="section-title">3. Select Users</span>
               </div>
               <template lwc:if={hasSelectedUsers}>
-                <span class="slds-badge slds-theme_info">{selectedUsersCount} selected</span>
+                <span class="slds-badge slds-theme_info"
+                  >{selectedUsersCount} selected</span
+                >
               </template>
             </div>
 
@@ -205,10 +245,14 @@
                           class="slds-m-right_small"
                         ></lightning-icon>
                         <div class="slds-col slds-truncate">
-                          <div class="slds-text-body_regular slds-truncate font-weight-600">
+                          <div
+                            class="slds-text-body_regular slds-truncate font-weight-600"
+                          >
                             {u.name}
                           </div>
-                          <div class="slds-text-body_extra-small slds-text-color_weak">
+                          <div
+                            class="slds-text-body_extra-small slds-text-color_weak"
+                          >
                             {u.profileName} &bull; {u.username}
                           </div>
                         </div>
@@ -216,7 +260,9 @@
                     </template>
                   </template>
                   <template lwc:else>
-                    <div class="slds-p-around_small slds-text-color_weak slds-text-align_center">
+                    <div
+                      class="slds-p-around_small slds-text-color_weak slds-text-align_center"
+                    >
                       No active users found for "{userSearchTerm}"
                     </div>
                   </template>
@@ -227,8 +273,12 @@
             <!-- Selected Users Pills Container -->
             <div class="slds-m-top_small">
               <template lwc:if={hasSelectedUsers}>
-                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
-                  <span class="slds-text-title_bold slds-text-color_weak">Selected:</span>
+                <div
+                  class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small"
+                >
+                  <span class="slds-text-title_bold slds-text-color_weak"
+                    >Selected:</span
+                  >
                   <button
                     class="slds-button slds-text-color_error slds-text-body_extra-small"
                     onclick={handleClearAllUsers}
@@ -243,7 +293,11 @@
                         icon-name="standard:user"
                         size="xx-small"
                       ></lightning-icon>
-                      <span class="slds-truncate" style="max-width: 140px;" title={u.name}>
+                      <span
+                        class="slds-truncate"
+                        style="max-width: 140px"
+                        title={u.name}
+                      >
                         {u.name}
                       </span>
                       <lightning-button-icon
@@ -259,7 +313,9 @@
                 </div>
               </template>
               <template lwc:else>
-                <div class="slds-text-body_extra-small slds-text-color_weak slds-p-around_x-small slds-text-align_center slds-border_dashed">
+                <div
+                  class="slds-text-body_extra-small slds-text-color_weak slds-p-around_x-small slds-text-align_center slds-border_dashed"
+                >
                   Search & click to add users (multi-select supported)
                 </div>
               </template>
@@ -269,13 +325,20 @@
       </div>
 
       <!-- Action Toolbar -->
-      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_small slds-p-top_small slds-border_top">
+      <div
+        class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-top_small slds-p-top_small slds-border_top"
+      >
         <div class="slds-text-body_small slds-text-color_weak">
           <template lwc:if={isApplyDisabled}>
-            <span class="slds-text-color_inverse-weak">Please select at least one record and one user to check access.</span>
+            <span class="slds-text-color_inverse-weak"
+              >Please select at least one record and one user to check
+              access.</span
+            >
           </template>
           <template lwc:else>
-            Ready to evaluate <strong>{selectedRecordsCount} record(s)</strong> across <strong>{selectedUsersCount} user(s)</strong>.
+            Ready to evaluate
+            <strong>{selectedRecordsCount} record(s)</strong> across
+            <strong>{selectedUsersCount} user(s)</strong>.
           </template>
         </div>
         <div class="slds-button-group" role="group">
@@ -299,7 +362,10 @@
     <!-- Error Banner -->
     <template lwc:if={errorMessage}>
       <div class="slds-m-horizontal_medium slds-m-bottom_medium">
-        <div class="slds-notify slds-notify_alert slds-theme_error" role="alert">
+        <div
+          class="slds-notify slds-notify_alert slds-theme_error"
+          role="alert"
+        >
           <span class="slds-assistive-text">error</span>
           <h2>{errorMessage}</h2>
         </div>
@@ -308,15 +374,20 @@
 
     <!-- Loading Spinner -->
     <template lwc:if={isLoading}>
-      <div class="slds-p-around_large slds-is-relative" style="height: 200px;">
-        <lightning-spinner alternative-text="Evaluating record access..." size="medium"></lightning-spinner>
+      <div class="slds-p-around_large slds-is-relative" style="height: 200px">
+        <lightning-spinner
+          alternative-text="Evaluating record access..."
+          size="medium"
+        ></lightning-spinner>
       </div>
     </template>
 
     <!-- Results Matrix Section -->
     <template lwc:if={hasResults}>
       <div class="slds-p-around_medium slds-border_top">
-        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small">
+        <div
+          class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small"
+        >
           <div class="slds-grid slds-grid_vertical-align-center">
             <lightning-icon
               icon-name="utility:matrix"
@@ -330,8 +401,25 @@
               {matrixRows.length} Records evaluated
             </span>
           </div>
-          <div class="slds-text-body_extra-small slds-text-color_weak">
-            Click the <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-horizontal_xx-small"></lightning-icon> icon in any row to see in-depth sharing analysis.
+          <div class="slds-grid slds-grid_vertical-align-center">
+            <div
+              class="slds-text-body_extra-small slds-text-color_weak slds-m-right_small"
+            >
+              Click the
+              <lightning-icon
+                icon-name="utility:info"
+                size="xx-small"
+                class="slds-m-horizontal_xx-small"
+              ></lightning-icon>
+              icon in any row to see in-depth sharing analysis.
+            </div>
+            <lightning-button
+              label="Export CSV"
+              icon-name="utility:download"
+              variant="neutral"
+              size="small"
+              onclick={handleExportMatrixCsv}
+            ></lightning-button>
           </div>
         </div>
 
@@ -340,22 +428,51 @@
             <thead>
               <!-- Top Header Row -->
               <tr>
-                <th class="record-col-header" rowspan="2" style="width: 50px; text-align: center;">
+                <th
+                  class="record-col-header"
+                  rowspan="2"
+                  style="width: 50px; text-align: center"
+                >
                   Info
                 </th>
-                <th class="record-col-header" rowspan="2" style="min-width: 180px;">
+                <th
+                  class="record-col-header"
+                  rowspan="2"
+                  style="min-width: 180px"
+                >
                   Record Name
                 </th>
-                <th class="record-col-header" rowspan="2" style="min-width: 110px;">
+                <th
+                  class="record-col-header"
+                  rowspan="2"
+                  style="min-width: 110px"
+                >
                   sObject
                 </th>
-                <th class="record-col-header" rowspan="2" style="min-width: 140px;">
+                <th
+                  class="record-col-header"
+                  rowspan="2"
+                  style="min-width: 140px"
+                >
                   Record ID
                 </th>
                 <template for:each={matrixUsers} for:item="u">
-                  <th key={u.userId} colspan="2" style="min-width: 160px; text-align: center; border-left: 2px solid #94a3b8;">
-                    <div class="slds-truncate" title={u.userName}>{u.userName}</div>
-                    <div class="slds-badge slds-m-top_xx-small" style="font-size: 0.68rem; font-weight: normal;">
+                  <th
+                    key={u.userId}
+                    colspan="2"
+                    style="
+                      min-width: 160px;
+                      text-align: center;
+                      border-left: 2px solid #94a3b8;
+                    "
+                  >
+                    <div class="slds-truncate" title={u.userName}>
+                      {u.userName}
+                    </div>
+                    <div
+                      class="slds-badge slds-m-top_xx-small"
+                      style="font-size: 0.68rem; font-weight: normal"
+                    >
                       {u.profileName}
                     </div>
                   </th>
@@ -364,10 +481,27 @@
               <!-- Sub-header Row for Read & Edit -->
               <tr>
                 <template for:each={matrixUsers} for:item="u">
-                  <th key={u.readKey} style="width: 80px; text-align: center; border-left: 2px solid #94a3b8; background: #e2e8f0; font-size: 0.75rem;">
+                  <th
+                    key={u.readKey}
+                    style="
+                      width: 80px;
+                      text-align: center;
+                      border-left: 2px solid #94a3b8;
+                      background: #e2e8f0;
+                      font-size: 0.75rem;
+                    "
+                  >
                     Read
                   </th>
-                  <th key={u.editKey} style="width: 80px; text-align: center; background: #e2e8f0; font-size: 0.75rem;">
+                  <th
+                    key={u.editKey}
+                    style="
+                      width: 80px;
+                      text-align: center;
+                      background: #e2e8f0;
+                      font-size: 0.75rem;
+                    "
+                  >
                     Edit
                   </th>
                 </template>
@@ -377,7 +511,7 @@
               <template for:each={matrixRows} for:item="row">
                 <tr key={row.recordId}>
                   <!-- Info / Details Action Button -->
-                  <td style="text-align: center;">
+                  <td style="text-align: center">
                     <lightning-button-icon
                       icon-name="utility:info"
                       variant="bare"
@@ -389,41 +523,73 @@
                   </td>
                   <!-- Record Name -->
                   <td class="font-weight-600">
-                    <span class="slds-truncate" title={row.recordName}>{row.recordName}</span>
+                    <span class="slds-truncate" title={row.recordName}
+                      >{row.recordName}</span
+                    >
                   </td>
                   <!-- sObject -->
                   <td>
-                    <span class="slds-badge slds-badge_lightest">{row.sObjectLabel}</span>
+                    <span class="slds-badge slds-badge_lightest"
+                      >{row.sObjectLabel}</span
+                    >
                   </td>
                   <!-- Record ID -->
                   <td>
-                    <span class="mono-font slds-text-color_weak">{row.recordId}</span>
+                    <span class="mono-font slds-text-color_weak"
+                      >{row.recordId}</span
+                    >
                   </td>
                   <!-- User Access Cells (Read & Edit) -->
                   <template for:each={row.cells} for:item="cell">
                     <!-- Read Cell -->
-                    <td key={cell.readKey} class="access-cell" style="border-left: 2px solid #e2e8f0;">
+                    <td
+                      key={cell.readKey}
+                      class="access-cell"
+                      style="border-left: 2px solid #e2e8f0"
+                    >
                       <template lwc:if={cell.hasReadAccess}>
-                        <span class="access-badge-true" title="User has Read Access">
-                          <lightning-icon icon-name="utility:check" size="xx-small" variant="success"></lightning-icon>
+                        <span
+                          class="access-badge-true"
+                          title="User has Read Access"
+                        >
+                          <lightning-icon
+                            icon-name="utility:check"
+                            size="xx-small"
+                            variant="success"
+                          ></lightning-icon>
                         </span>
                       </template>
                       <template lwc:else>
                         <span class="access-badge-false" title="No Read Access">
-                          <lightning-icon icon-name="utility:close" size="xx-small" variant="error"></lightning-icon>
+                          <lightning-icon
+                            icon-name="utility:close"
+                            size="xx-small"
+                            variant="error"
+                          ></lightning-icon>
                         </span>
                       </template>
                     </td>
                     <!-- Edit Cell -->
                     <td key={cell.editKey} class="access-cell">
                       <template lwc:if={cell.hasEditAccess}>
-                        <span class="access-badge-true" title="User has Edit Access">
-                          <lightning-icon icon-name="utility:check" size="xx-small" variant="success"></lightning-icon>
+                        <span
+                          class="access-badge-true"
+                          title="User has Edit Access"
+                        >
+                          <lightning-icon
+                            icon-name="utility:check"
+                            size="xx-small"
+                            variant="success"
+                          ></lightning-icon>
                         </span>
                       </template>
                       <template lwc:else>
                         <span class="access-badge-false" title="No Edit Access">
-                          <lightning-icon icon-name="utility:close" size="xx-small" variant="error"></lightning-icon>
+                          <lightning-icon
+                            icon-name="utility:close"
+                            size="xx-small"
+                            variant="error"
+                          ></lightning-icon>
                         </span>
                       </template>
                     </td>
@@ -438,9 +604,17 @@
 
     <!-- Empty State / Instructions when not yet evaluated -->
     <template lwc:if={hasNoResults}>
-      <div class="slds-p-around_large slds-text-align_center slds-text-color_weak">
-        <lightning-icon icon-name="utility:warning" size="medium" class="slds-m-bottom_small"></lightning-icon>
-        <p class="slds-text-heading_small">No records or users could be evaluated.</p>
+      <div
+        class="slds-p-around_large slds-text-align_center slds-text-color_weak"
+      >
+        <lightning-icon
+          icon-name="utility:warning"
+          size="medium"
+          class="slds-m-bottom_small"
+        ></lightning-icon>
+        <p class="slds-text-heading_small">
+          No records or users could be evaluated.
+        </p>
       </div>
     </template>
   </div>
@@ -455,12 +629,20 @@
     >
       <div class="slds-modal__container">
         <!-- Modal Header -->
-        <header class="slds-modal__header modal-header-banner slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+        <header
+          class="slds-modal__header modal-header-banner slds-grid slds-grid_align-spread slds-grid_vertical-align-center"
+        >
           <div>
-            <h2 class="slds-text-heading_medium" style="color: #ffffff; font-weight: 700;">
+            <h2
+              class="slds-text-heading_medium"
+              style="color: #ffffff; font-weight: 700"
+            >
               Record Sharing & Access Analysis
             </h2>
-            <p class="slds-m-top_xx-small" style="color: #cbd5e1; font-size: 0.82rem;">
+            <p
+              class="slds-m-top_xx-small"
+              style="color: #cbd5e1; font-size: 0.82rem"
+            >
               Comprehensive breakdown of how each user obtains Read/Edit access.
             </p>
           </div>
@@ -474,10 +656,19 @@
         </header>
 
         <!-- Modal Body -->
-        <div class="slds-modal__content slds-p-around_medium" style="max-height: 70vh; overflow-y: auto;">
+        <div
+          class="slds-modal__content slds-p-around_medium"
+          style="max-height: 70vh; overflow-y: auto"
+        >
           <template lwc:if={isModalLoading}>
-            <div class="slds-p-around_xx-large slds-is-relative" style="height: 180px;">
-              <lightning-spinner alternative-text="Analyzing record sharing..." size="medium"></lightning-spinner>
+            <div
+              class="slds-p-around_xx-large slds-is-relative"
+              style="height: 180px"
+            >
+              <lightning-spinner
+                alternative-text="Analyzing record sharing..."
+                size="medium"
+              ></lightning-spinner>
             </div>
           </template>
 
@@ -486,26 +677,43 @@
             <div class="summary-strip slds-m-bottom_medium">
               <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-                  <div class="slds-text-color_weak slds-text-body_extra-small">Record Name:</div>
-                  <div class="slds-text-title_bold slds-truncate">{modalData.recordName}</div>
+                  <div class="slds-text-color_weak slds-text-body_extra-small">
+                    Record Name:
+                  </div>
+                  <div class="slds-text-title_bold slds-truncate">
+                    {modalData.recordName}
+                  </div>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-                  <div class="slds-text-color_weak slds-text-body_extra-small">sObject:</div>
-                  <div class="slds-text-title_bold">{modalData.sObjectLabel} ({modalData.sObjectName})</div>
+                  <div class="slds-text-color_weak slds-text-body_extra-small">
+                    sObject:
+                  </div>
+                  <div class="slds-text-title_bold">
+                    {modalData.sObjectLabel} ({modalData.sObjectName})
+                  </div>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-                  <div class="slds-text-color_weak slds-text-body_extra-small">Record Owner:</div>
+                  <div class="slds-text-color_weak slds-text-body_extra-small">
+                    Record Owner:
+                  </div>
                   <div class="slds-text-title_bold">{modalData.ownerName}</div>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-                  <div class="slds-text-color_weak slds-text-body_extra-small">Org-Wide Default (OWD):</div>
-                  <span class="slds-badge slds-theme_info">{modalData.internalSharingModel}</span>
+                  <div class="slds-text-color_weak slds-text-body_extra-small">
+                    Org-Wide Default (OWD):
+                  </div>
+                  <span class="slds-badge slds-theme_info"
+                    >{modalData.internalSharingModel}</span
+                  >
                 </div>
               </div>
             </div>
 
             <!-- User Explanations List -->
-            <h3 class="slds-text-title_bold slds-m-bottom_small slds-text-color_weak" style="text-transform: uppercase; letter-spacing: 0.5px;">
+            <h3
+              class="slds-text-title_bold slds-m-bottom_small slds-text-color_weak"
+              style="text-transform: uppercase; letter-spacing: 0.5px"
+            >
               User Access Breakdown
             </h3>
 
@@ -519,8 +727,12 @@
                       class="slds-m-right_small"
                     ></lightning-icon>
                     <div>
-                      <span class="slds-text-title_bold slds-m-right_x-small">{userExp.userName}</span>
-                      <span class="slds-badge slds-badge_lightest">{userExp.profileName}</span>
+                      <span class="slds-text-title_bold slds-m-right_x-small"
+                        >{userExp.userName}</span
+                      >
+                      <span class="slds-badge slds-badge_lightest"
+                        >{userExp.profileName}</span
+                      >
                     </div>
                   </div>
                   <div>
@@ -534,22 +746,23 @@
                 <table class="reason-table">
                   <thead>
                     <tr>
-                      <th style="width: 25%;">Access Source</th>
-                      <th style="width: 20%;">Access Level</th>
-                      <th style="width: 55%;">Explanation / Details</th>
+                      <th style="width: 25%">Access Source</th>
+                      <th style="width: 20%">Access Level</th>
+                      <th style="width: 55%">Explanation / Details</th>
                     </tr>
                   </thead>
                   <tbody>
                     <template for:each={userExp.reasons} for:item="reason">
                       <tr key={reason.key}>
                         <td>
-                          <span class="slds-badge slds-theme_shade" style="font-size: 0.75rem;">
+                          <span
+                            class="slds-badge slds-theme_shade"
+                            style="font-size: 0.75rem"
+                          >
                             {reason.category}
                           </span>
                         </td>
-                        <td class="font-weight-600">
-                          {reason.accessLevel}
-                        </td>
+                        <td class="font-weight-600">{reason.accessLevel}</td>
                         <td class="slds-text-color_default">
                           {reason.details}
                         </td>

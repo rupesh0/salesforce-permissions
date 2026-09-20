@@ -69,7 +69,11 @@ export default class RecordAccess extends LightningElement {
         this.selectedSObject = this.allSObjectOptions[0].value;
       }
     } catch (err) {
-      this.showToast("Error loading sObjects", reduceErrors(err).join(", "), "error");
+      this.showToast(
+        "Error loading sObjects",
+        reduceErrors(err).join(", "),
+        "error"
+      );
     } finally {
       this.isSObjectsLoading = false;
     }
@@ -138,7 +142,9 @@ export default class RecordAccess extends LightningElement {
   }
 
   get hasNoResults() {
-    return this.hasEvaluated && (!this.matrixRows || this.matrixRows.length === 0);
+    return (
+      this.hasEvaluated && (!this.matrixRows || this.matrixRows.length === 0)
+    );
   }
 
   // --- Event Handlers: sObject ---
@@ -177,7 +183,9 @@ export default class RecordAccess extends LightningElement {
   handleRecordFocus() {
     this.showRecordDropdown = true;
     if (this.recordSearchResults.length === 0) {
-      this.handleRecordSearchInput({ target: { value: this.recordSearchTerm } });
+      this.handleRecordSearchInput({
+        target: { value: this.recordSearchTerm }
+      });
     }
   }
 
@@ -199,7 +207,9 @@ export default class RecordAccess extends LightningElement {
 
   handleRemoveRecord(event) {
     const recordId = event.currentTarget.dataset.id;
-    this.selectedRecords = this.selectedRecords.filter((r) => r.id !== recordId);
+    this.selectedRecords = this.selectedRecords.filter(
+      (r) => r.id !== recordId
+    );
   }
 
   handleClearAllRecords() {
@@ -314,7 +324,11 @@ export default class RecordAccess extends LightningElement {
       this.hasEvaluated = true;
     } catch (err) {
       this.errorMessage = reduceErrors(err).join(", ");
-      this.showToast("Error evaluating record access", this.errorMessage, "error");
+      this.showToast(
+        "Error evaluating record access",
+        this.errorMessage,
+        "error"
+      );
     } finally {
       this.isLoading = false;
     }
